@@ -6,8 +6,6 @@ import consts
 
 from telebot import types
 
-USER_SUBSCIRBED = 1
-USER_UNSUBSCRIBED = 0
 TELEBOT_ENV_VARIABLE = 'KIK_TELEBOT_API_KEY'
 
 api_key = os.environ[TELEBOT_ENV_VARIABLE]
