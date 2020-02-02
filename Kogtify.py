@@ -1,16 +1,22 @@
 import telebot
-
+import os
 import database
 
 import consts
 
-from database import *
 from telebot import types
 
 USER_SUBSCIRBED = 1
 USER_UNSUBSCRIBED = 0
+TELEBOT_ENV_VARIABLE = 'KIK_TELEBOT_API_KEY'
 
-bot = telebot.TeleBot('1022712943:AAH-svQMnwb-J94mtcqydxnNsm786L3x0Wk')
+api_key = os.environ[TELEBOT_ENV_VARIABLE]
+
+if(api_key == None):
+    raise Exception(
+        '''Environment variable KIK_TELEBOT_API_KEY aren't present''')
+
+bot = telebot.TeleBot(api_key)
 
 
 @bot.message_handler(content_types=['text'])
@@ -29,13 +35,13 @@ def get_text_messages(message):
 def ask_nickname(message):
     bot.send_message(message.from_user.id,
                      "Привет, давай я тебя запишу. Какой у тебя никнейм? (Давай без хуйни только ок?)")
-    create_user(message.from_user.id)
+    database.create_user(message.from_user.id)
     bot.register_next_step_handler(message, get_user_nickname)
 
 
 def get_user_nickname(message):
     nickname = message.text
-    update_user(message.from_user.id, 'real_name', message.text)
+    database.update_user(message.from_user.id, 'real_name', message.text)
     # ask_for_phone(message)
     ask_for_subscription(message)
 
@@ -55,7 +61,7 @@ def get_user_nickname(message):
 
 def get_subscribe(message):
     phone = message.text
-    update_user(message.from_user.id, 'phone', message.text)
+    database.update_user(message.from_user.id, 'phone', message.text)
     ask_for_subscription(message)
 
 
@@ -75,7 +81,7 @@ def ask_for_subscription(message):
 
 
 def send_menu(message):
-    user = get_user(message.from_user.id)
+    user = database.get_user(message.from_user.id)
 
     keyboard = types.InlineKeyboardMarkup()
     key_azur = types.InlineKeyboardButton(
@@ -108,12 +114,13 @@ def callback_worker(call):
     #    bot.send_message(call.from_user.id,"Введите номер в формате (8 123 456 78 90)")
     #    bot.register_next_step_handler(message, get_subscribe)
     if call.data == "subscribe":
-        set_subscription(call.from_user.id, consts.DB_USER_SUBSCRIBED)
+        database.set_subscription(call.from_user.id, consts.DB_USER_SUBSCRIBED)
         bot.send_message(call.from_user.id,
                          "Я тебя запомнил, уебок")
         send_menu(call)
     elif call.data == "unsubscribe":
-        set_subscription(call.from_user.id, consts.DB_USER_UNSUBSCRIBED)
+        database.set_subscription(
+            call.from_user.id, consts.DB_USER_UNSUBSCRIBED)
         bot.send_message(call.from_user.id,
                          "Я тебя запомнил, уебок")
         send_menu(call)
@@ -122,8 +129,8 @@ def callback_worker(call):
 
 
 def notify_all(boss, by):
-    user = get_user(by)
-    subscribed = get_subscribed_users()
+    user = database.get_user(by)
+    subscribed = database.get_subscribed_users()
 
     for subscriber in subscribed:
         bot.send_message(int(subscriber.name), '''%s обнаружил %s''' %
