@@ -28,7 +28,7 @@ def get_text_messages(message):
 
 def ask_nickname(message):
     bot.send_message(message.from_user.id,
-                     "Привет, давай я тебя запишу. Какой у тебя никнейм? (Давай без хуйни только ок?)")
+                     "Привет, давай я тебя запишу. Какой у тебя никнейм?")
     create_user(message.from_user.id)
     bot.register_next_step_handler(message, get_user_nickname)
 
