@@ -40,21 +40,7 @@ def ask_nickname(message):
 def get_user_nickname(message):
     nickname = message.text
     database.update_user(message.from_user.id, 'real_name', message.text)
-    # ask_for_phone(message)
     ask_for_subscription(message)
-
-
-# def ask_for_phone(message):
-#    keyboard = types.InlineKeyboardMarkup()
-#    key_add = types.InlineKeyboardButton(
-#        text="Хочу", callback_data='add_number')
-#    key_skip = types.InlineKeyboardButton(
-#        text='Не хочу', callback_data='skip_number')
-#    keyboard.add(key_skip)
-#
-#    question = 'Если хочешь, укажи номер телефона'
-#    bot.send_message(message.from_user.id, text=question,
-#                     reply_markup=keyboard)
 
 
 def get_subscribe(message):
@@ -106,11 +92,6 @@ def send_menu(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
-    # if call.data == "skip_number":
-    #    ask_for_subscription(call)
-    # elif call.data == "add_number":
-    #    bot.send_message(call.from_user.id,"Введите номер в формате (8 123 456 78 90)")
-    #    bot.register_next_step_handler(message, get_subscribe)
     if call.data == "subscribe":
         database.set_subscription(call.from_user.id, consts.DB_USER_SUBSCRIBED)
         bot.send_message(call.from_user.id,
