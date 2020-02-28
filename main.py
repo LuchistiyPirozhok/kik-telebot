@@ -2,7 +2,7 @@ import telebot
 import os
 import database
 
-import consts
+import constants
 
 from telebot import types
 
@@ -76,7 +76,7 @@ def send_menu(message):
         text='!!! Каззак !!!', callback_data='Каззак')
     keyboard.add(key_kazzak)
 
-    if user.subscribed == consts.DB_USER_SUBSCRIBED:
+    if user.subscribed == constants.DB_USER_SUBSCRIBED:
         unsubscribe_btn = types.InlineKeyboardButton(
             text="Отписаться", callback_data="unsubscribe")
         keyboard.add(unsubscribe_btn)
@@ -93,13 +93,14 @@ def send_menu(message):
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
     if call.data == "subscribe":
-        database.set_subscription(call.from_user.id, consts.DB_USER_SUBSCRIBED)
+        database.set_subscription(
+            call.from_user.id, constants.DB_USER_SUBSCRIBED)
         bot.send_message(call.from_user.id,
                          "Я тебя запомнил, уебок")
         send_menu(call)
     elif call.data == "unsubscribe":
         database.set_subscription(
-            call.from_user.id, consts.DB_USER_UNSUBSCRIBED)
+            call.from_user.id, constants.DB_USER_UNSUBSCRIBED)
         bot.send_message(call.from_user.id,
                          "Я тебя запомнил, уебок")
         send_menu(call)
