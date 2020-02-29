@@ -21,5 +21,5 @@ class Locale:
         return f'Вы уже зарегистрированы как {user_name}'
 
 
-class LocaleExeptions:
+class LocaleExceptions:
     ENVIRONMENT_API_KEY_NOT_FOUND = '''Environment variable KIK_TELEBOT_API_KEY aren't present'''

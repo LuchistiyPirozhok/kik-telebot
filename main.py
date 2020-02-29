@@ -4,7 +4,7 @@ import database
 
 
 from telebot import types
-from localization import LocaleExeptions, Locale
+from localization import LocaleExceptions, Locale
 from constants import Database, Commands
 
 TELEBOT_ENV_VARIABLE = 'KIK_TELEBOT_API_KEY'
@@ -12,7 +12,7 @@ TELEBOT_ENV_VARIABLE = 'KIK_TELEBOT_API_KEY'
 api_key = os.environ[TELEBOT_ENV_VARIABLE]
 
 if(api_key == None):
-    raise Exception(LocaleExeptions.ENVIRONMENT_API_KEY_NOT_FOUND)
+    raise Exception(LocaleExceptions.ENVIRONMENT_API_KEY_NOT_FOUND)
 
 bot = telebot.TeleBot(api_key)
 
