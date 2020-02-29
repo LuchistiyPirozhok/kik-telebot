@@ -1,7 +1,7 @@
 class Locale:
     CHARACTER_NAME = '''Введите имя вашего основного персонажа'''
     BOT_HELP_MESSAGE = '''/start - регистрация
-                        /menu - показать меню
+/menu - показать меню
                         '''
     BOT_MENU_MESSAGE = '''Меню:'''
     CHARACTER_SUBCRIPTION = '''Подписаться'''
@@ -15,6 +15,10 @@ class Locale:
     @staticmethod
     def BOSS_NOTIFICATION(user_name, boss_name):
         return f'{user_name} обнаружил {boss_name}'
+
+    @staticmethod
+    def DUPLICATE_CHARACTER_NAME(user_name):
+        return f'Вы уже зарегистрированы как {user_name}'
 
 
 class LocaleExeptions:
