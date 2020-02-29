@@ -1,7 +1,7 @@
 
 import sqlite3
 
-import constants
+from constants import Database
 
 from threading import RLock
 
@@ -59,7 +59,7 @@ def get_subscribed_users():
     with dbLock:
         c.execute(
             '''SELECT * FROM users WHERE subscribed=%d''' % (
-                constants.DB_USER_SUBSCRIBED)
+                Database.DB_USER_SUBSCRIBED)
         )
         rows = c.fetchall()
         res = list()
