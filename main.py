@@ -20,14 +20,23 @@ bot = telebot.TeleBot(api_key)
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
     if message.text == Commands.START:
-        ask_nickname(message)
+        user = database.get_user(message.from_user.id)
+        if(user == None):
+            telegram_id(message)
+        else:
+            bot.send_message(
+                message.from_user.id, Locale.DUPLICATE_CHARACTER_NAME(user.character_name))
+            send_menu(message)
+
     elif message.text == Commands.HELP:
         bot.send_message(message.from_user.id, Locale.BOT_HELP_MESSAGE)
     elif message.text == Commands.MENU:
         send_menu(message)
+    elif message.text == Commands.ADD_GUILD:
+        send_add_guild(message)
 
 
-def ask_nickname(message):
+def telegram_id(message):
     bot.send_message(message.from_user.id, Locale.CHARACTER_NAME)
     database.create_user(message.from_user.id)
     bot.register_next_step_handler(message, get_user_nickname)
@@ -35,13 +44,37 @@ def ask_nickname(message):
 
 def get_user_nickname(message):
     nickname = message.text
-    database.update_user(message.from_user.id, 'real_name', message.text)
-    ask_for_subscription(message)
+    database.update_user(message.from_user.id,
+                         Database.FIELD_CHARACTER_NAME, message.text)
+    get_user_guild(message)
 
+# ----------------------
+# def send_add_guild(message):
+#
+# ----------------------
+
+
+def add_guild(message):
+    guild_name = message.text
+    database.insert_guild(message.text)
+    send_menu(message)
+
+
+def get_user_guild(message):
+    guilds = database.get_all_guilds()
+    keyboard = types.InlineKeyboardMarkup()
+    for guild in guilds:
+        key = types.InlineKeyboardButton(
+            text = guild.guild_name,callback_data=f'guild:{guild.guild_name}'
+        )
+        keyboard.add(key)
+    bot.send_message(message.from_user.id, text='Какая гильдия',
+                     reply_markup=keyboard)
 
 def get_subscribe(message):
     phone = message.text
-    database.update_user(message.from_user.id, 'phone', message.text)
+    database.update_user(message.from_user.id,
+                         Database.FIELD_CHARACTER_PHONE, message.text)
     ask_for_subscription(message)
 
 
@@ -64,6 +97,11 @@ def send_menu(message):
     user = database.get_user(message.from_user.id)
 
     keyboard = types.InlineKeyboardMarkup()
+
+    key_add_guild = types.InlineKeyboardButton(
+        text='Добавить гильдию', callback_data='add_guild')
+    keyboard.add(key_add_guild)
+
     key_azur = types.InlineKeyboardButton(
         text=Locale.BOSS_AZUREGOS, callback_data='Азурегос'
     )
@@ -103,14 +141,23 @@ def callback_worker(call):
     elif call.data == 'Азурегос' or call.data == 'Каззак':
         notify_all(call.data, call.from_user.id)
 
+    elif call.data == 'add_guild':
+        bot.send_message(call.from_user.id, 'введите название гильдии')
+        bot.register_next_step_handler_by_chat_id(call.from_user.id, add_guild)
+    
+    elif call.data.startswith('guild'):
+        guild_name = call.data.split(':')[1]
+        database.update_user(call.from_user.id, Database.FIELD_GUILD_NAME, guild_name)
+        ask_for_subscription(call)
+
 
 def notify_all(boss, by):
     user = database.get_user(by)
     subscribed = database.get_subscribed_users()
 
     for subscriber in subscribed:
-        bot.send_message(int(subscriber.name),
-                         Locale.BOSS_NOTIFICATION(user.real_name, boss))
+        bot.send_message(int(subscriber.telegram_id),
+                         Locale.BOSS_NOTIFICATION(user.character_name, boss))
 
 
 bot.polling(none_stop=True, interval=0)
