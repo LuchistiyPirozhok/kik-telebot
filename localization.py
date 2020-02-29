@@ -12,9 +12,9 @@ class Locale:
     BOSS_AZUREGOS = '!!! Азурегос !!!'
     BOSS_KAZZAK = '!!! Каззак !!!'
 
+    @staticmethod
     def BOSS_NOTIFICATION(user_name, boss_name):
-        return '''%s обнаружил %s''' %
-        (user_name, boss_name)
+        return f'{user_name} обнаружил {boss_name}'
 
 
 class LocaleExeptions:

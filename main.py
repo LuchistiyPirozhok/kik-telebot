@@ -4,7 +4,7 @@ import database
 
 
 from telebot import types
-from locale import LocaleExeptions, Locale
+from localization import LocaleExeptions, Locale
 from constants import Database, Commands
 
 TELEBOT_ENV_VARIABLE = 'KIK_TELEBOT_API_KEY'
@@ -74,11 +74,11 @@ def send_menu(message):
 
     if user.subscribed == Database.DB_USER_SUBSCRIBED:
         unsubscribe_btn = types.InlineKeyboardButton(
-            text=CHARACTER_UNSUBCRIPTION, callback_data="unsubscribe")
+            text=Locale.CHARACTER_UNSUBCRIPTION, callback_data="unsubscribe")
         keyboard.add(unsubscribe_btn)
     else:
         subscribe_btn = types.InlineKeyboardButton(
-            text=CHARACTER_SUBCRIPTION, callback_data="subscribe")
+            text=Locale.CHARACTER_SUBCRIPTION, callback_data="subscribe")
         keyboard.add(subscribe_btn)
 
     question = Locale.BOT_MENU_MESSAGE
