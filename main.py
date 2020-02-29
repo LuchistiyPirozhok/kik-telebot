@@ -32,8 +32,6 @@ def get_text_messages(message):
         bot.send_message(message.from_user.id, Locale.BOT_HELP_MESSAGE)
     elif message.text == Commands.MENU:
         send_menu(message)
-    elif message.text == Commands.ADD_GUILD:
-        send_add_guild(message)
 
 
 def telegram_id(message):
@@ -48,11 +46,6 @@ def get_user_nickname(message):
                          Database.FIELD_CHARACTER_NAME, message.text)
     get_user_guild(message)
 
-# ----------------------
-# def send_add_guild(message):
-#
-# ----------------------
-
 
 def add_guild(message):
     guild_name = message.text
@@ -65,11 +58,12 @@ def get_user_guild(message):
     keyboard = types.InlineKeyboardMarkup()
     for guild in guilds:
         key = types.InlineKeyboardButton(
-            text = guild.guild_name,callback_data=f'guild:{guild.guild_name}'
+            text=guild.guild_name, callback_data=f'guild:{guild.guild_name}'
         )
         keyboard.add(key)
     bot.send_message(message.from_user.id, text='Какая гильдия',
                      reply_markup=keyboard)
+
 
 def get_subscribe(message):
     phone = message.text
@@ -144,10 +138,11 @@ def callback_worker(call):
     elif call.data == 'add_guild':
         bot.send_message(call.from_user.id, 'введите название гильдии')
         bot.register_next_step_handler_by_chat_id(call.from_user.id, add_guild)
-    
+
     elif call.data.startswith('guild'):
         guild_name = call.data.split(':')[1]
-        database.update_user(call.from_user.id, Database.FIELD_GUILD_NAME, guild_name)
+        database.update_user(
+            call.from_user.id, Database.FIELD_GUILD_NAME, guild_name)
         ask_for_subscription(call)
 
 
