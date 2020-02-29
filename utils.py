@@ -3,6 +3,12 @@ from telebot import types
 from typing import Callable, List, Dict
 
 
+class DialogElement:
+    def __init__(self: DialogElement, message: str, responseHandler: Callable[[object]]):
+        self.message = message
+        self.responseHandler = responseHandler
+
+
 def create_menu(buttons: Dict[str, str]):
     keyboard = types.InlineKeyboardMarkup()
 
@@ -14,12 +20,6 @@ def create_menu(buttons: Dict[str, str]):
         keyboard.add(keyboard_key)
 
     return keyboard
-
-
-class DialogElement:
-    def __init__(self: DialogElement, message: str, responseHandler: Callable[[object]]):
-        self.message = message
-        self.responseHandler = responseHandler
 
 
 def map_dialog_element(bot, dialog_element: DialogElement, nextHandler: Callable[[object]]):
