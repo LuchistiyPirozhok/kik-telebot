@@ -59,13 +59,6 @@ def get_user_guild(message):
                      reply_markup=botutils.create_menu_from_guilds(guilds))
 
 
-def get_subscribe(message):
-    phone = message.text
-    database.update_user(message.from_user.id,
-                         Database.FIELD_CHARACTER_PHONE, message.text)
-    ask_for_subscription(message)
-
-
 def ask_for_subscription(message):
 
     keyboard = botutils.create_menu({
