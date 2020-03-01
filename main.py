@@ -1,7 +1,7 @@
 import telebot
 import os
 import database
-
+import botutils
 
 from telebot import types
 from localization import LocaleExceptions, Locale
@@ -55,14 +55,8 @@ def add_guild(message):
 
 def get_user_guild(message):
     guilds = database.get_all_guilds()
-    keyboard = types.InlineKeyboardMarkup()
-    for guild in guilds:
-        key = types.InlineKeyboardButton(
-            text=guild.guild_name, callback_data=f'guild:{guild.guild_name}'
-        )
-        keyboard.add(key)
     bot.send_message(message.from_user.id, text='Какая гильдия',
-                     reply_markup=keyboard)
+                     reply_markup=botutils.create_menu_from_guilds(guilds))
 
 
 def get_subscribe(message):
@@ -73,14 +67,11 @@ def get_subscribe(message):
 
 
 def ask_for_subscription(message):
-    keyboard = types.InlineKeyboardMarkup()
-    key_accept = types.InlineKeyboardButton(
-        text=Locale.CHARACTER_SUBCRIPTION, callback_data='subscribe'
-    )
-    keyboard.add(key_accept)
-    key_skip = types.InlineKeyboardButton(
-        text=Locale.CHARACTER_UNSUBCRIPTION, callback_data='unsubscribe')
-    keyboard.add(key_skip)
+
+    keyboard = botutils.create_menu({
+        Locale.CHARACTER_SUBCRIPTION: 'subscribe',
+        Locale.CHARACTER_UNSUBCRIPTION: 'unsubscribe'
+    })
 
     question = Locale.CHARACTER_QUESTION_ABOUT_SUBCRIPTION
     bot.send_message(message.from_user.id, text=question,
@@ -90,32 +81,20 @@ def ask_for_subscription(message):
 def send_menu(message):
     user = database.get_user(message.from_user.id)
 
-    keyboard = types.InlineKeyboardMarkup()
-
-    key_add_guild = types.InlineKeyboardButton(
-        text='Добавить гильдию', callback_data='add_guild')
-    keyboard.add(key_add_guild)
-
-    key_azur = types.InlineKeyboardButton(
-        text=Locale.BOSS_AZUREGOS, callback_data='Азурегос'
-    )
-    keyboard.add(key_azur)
-    key_kazzak = types.InlineKeyboardButton(
-        text=Locale.BOSS_KAZZAK, callback_data='Каззак')
-    keyboard.add(key_kazzak)
+    menu = {
+        'Добавить гильдию': 'add_guild',
+        Locale.BOSS_AZUREGOS: 'Азурегос',
+        Locale.BOSS_KAZZAK: 'Каззак'
+    }
 
     if user.subscribed == Database.DB_USER_SUBSCRIBED:
-        unsubscribe_btn = types.InlineKeyboardButton(
-            text=Locale.CHARACTER_UNSUBCRIPTION, callback_data="unsubscribe")
-        keyboard.add(unsubscribe_btn)
+        menu[Locale.CHARACTER_UNSUBCRIPTION] = "unsubscribe"
     else:
-        subscribe_btn = types.InlineKeyboardButton(
-            text=Locale.CHARACTER_SUBCRIPTION, callback_data="subscribe")
-        keyboard.add(subscribe_btn)
+        menu[Locale.CHARACTER_SUBCRIPTION] = "subscribe"
 
     question = Locale.BOT_MENU_MESSAGE
     bot.send_message(message.from_user.id, text=question,
-                     reply_markup=keyboard)
+                     reply_markup=botutils.create_menu(menu))
 
 
 @bot.callback_query_handler(func=lambda call: True)
