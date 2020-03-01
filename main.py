@@ -22,7 +22,7 @@ def get_text_messages(message):
     if message.text == Commands.START:
         user = database.get_user(message.from_user.id)
         if(user == None):
-            telegram_id(message)
+            get_telegram_id(message)
         else:
             bot.send_message(
                 message.from_user.id, Locale.DUPLICATE_CHARACTER_NAME(user.character_name))
@@ -34,7 +34,7 @@ def get_text_messages(message):
         send_menu(message)
 
 
-def telegram_id(message):
+def get_telegram_id(message):
     bot.send_message(message.from_user.id, Locale.CHARACTER_NAME)
     database.create_user(message.from_user.id)
     bot.register_next_step_handler(message, get_user_nickname)
