@@ -1,5 +1,7 @@
 from telebot import types
 
+from database import Guild
+
 from typing import Callable, List, Dict
 
 
@@ -19,6 +21,16 @@ def create_menu(buttons: Dict[str, str]):
 
         keyboard.add(keyboard_key)
 
+    return keyboard
+
+
+def create_menu_from_guilds(guilds: List[Guild]):
+    keyboard = types.InlineKeyboardMarkup()
+    for guild in guilds:
+        key = types.InlineKeyboardButton(
+            text=guild.guild_name, callback_data=f'guild:{guild.guild_name}'
+        )
+        keyboard.add(key)
     return keyboard
 
 
