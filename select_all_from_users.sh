@@ -1,3 +1,3 @@
 #!/bin/bash
-/usr/bin/sqlite3 /var/bot/kik-telebot/users.db 'select * from users'
-/usr/bin/sqlite3 /var/bot/kik-telebot/users.db 'select * from guilds'
+sqlite3 users.db 'select * from users'
+sqlite3 users.db 'select * from guilds'
