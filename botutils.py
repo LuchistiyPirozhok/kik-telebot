@@ -6,7 +6,7 @@ from typing import Callable, List, Dict
 
 
 class DialogElement:
-    def __init__(self: DialogElement, message: str, responseHandler: Callable[[object]]):
+    def __init__(self, message: str, responseHandler: Callable[[object], None]):
         self.message = message
         self.responseHandler = responseHandler
 
@@ -14,7 +14,7 @@ class DialogElement:
 def create_menu(buttons: Dict[str, str]):
     keyboard = types.InlineKeyboardMarkup()
 
-    for text, data in buttons:
+    for text, data in buttons.items():
         keyboard_key = types.InlineKeyboardButton(
             text=text, callback_data=data
         )
@@ -34,7 +34,7 @@ def create_menu_from_guilds(guilds: List[Guild]):
     return keyboard
 
 
-def map_dialog_element(bot, dialog_element: DialogElement, nextHandler: Callable[[object]]):
+def map_dialog_element(bot, dialog_element: DialogElement, nextHandler: Callable[[object], None]):
     def handler(message):
         if dialog_element.message != None:
             bot.send_message(message.from_user.id, dialog_element.message)
