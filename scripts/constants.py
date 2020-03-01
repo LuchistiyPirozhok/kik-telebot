@@ -2,15 +2,20 @@
 class Database:
     DB_USER_SUBSCRIBED = 1
     DB_USER_UNSUBSCRIBED = 0
+    FIELD_TELEGRAM_ID = 'telegram_id'
     FIELD_CHARACTER_NAME = 'character_name'
-    FIELD_CHARACTER_PHONE = 'phone'
+    FIELD_PHONE = 'phone'
+    FIELD_SUBSCRIBED = 'subscribed'
     FIELD_GUILD_NAME = 'guild_name'
-    
 
 
 class DatabaseQueries:
     CREATE_TABLE_USERS_IF_NOT_EXISTS = '''CREATE TABLE IF NOT EXISTS users
-             (telegram_id text PRIMARY KEY,character_name text ,phone text, subscribed int, guild_name text)'''
+             (telegram_id text PRIMARY KEY,
+              character_name text,
+              phone text,
+              subscribed int,
+              guild_name text)'''
 
     CREATE_TABLE_GUILDS_IF_NOT_EXISTS = '''CREATE TABLE IF NOT EXISTS guilds
              (guild_name text PRIMARY KEY)'''

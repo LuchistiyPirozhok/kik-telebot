@@ -1,5 +1,6 @@
 
 import sqlite3
+import os
 
 from constants import Database
 
@@ -7,7 +8,7 @@ from threading import RLock
 
 from constants import Database, Commands, DatabaseQueries
 
-dbConnection = sqlite3.connect('users.db', check_same_thread=False)
+dbConnection = sqlite3.connect('users.db', uri=True, check_same_thread=False)
 
 c = dbConnection.cursor()
 c.execute(DatabaseQueries.CREATE_TABLE_USERS_IF_NOT_EXISTS)
