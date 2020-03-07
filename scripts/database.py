@@ -121,3 +121,51 @@ def remove_user(telegram_id):
         c.execute(DatabaseQueries.DELETE_FROM_USERS_WHERE_TELEGRAM_ID(telegram_id))
 
         dbConnection.commit()
+
+def get_all_users():
+    with dbLock:
+        #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
+        c.execute(DatabaseQueries.SELECT_ALL_FROM_USERS)
+
+        rows = c.fetchall()
+        res = list()
+
+        for row in rows:
+            res.append(User(row))
+        return res
+
+def get_all_pending_users():
+    with dbLock:
+        #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
+        c.execute(DatabaseQueries.SELECT_ALL_FROM_USERS_WHERE_STATUS_PENDING)
+#проверить на наличие
+        rows = c.fetchall()
+        res = list()
+
+        for row in rows:
+            res.append(User(row))
+        return res
+
+def get_all_banned_users():
+    with dbLock:
+        #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
+        c.execute(DatabaseQueries.SELECT_ALL_FROM_USERS_WHERE_STATUS_BANNED)
+
+        rows = c.fetchall()
+        res = list()
+
+        for row in rows:
+            res.append(User(row))
+        return res
+
+def get_all_admins():
+    with dbLock:
+        #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
+        c.execute(DatabaseQueries.SELECT_ALL_FROM_USERS_WHERE_STATUS_ADMIN)
+
+        rows = c.fetchall()
+        res = list()
+
+        for row in rows:
+            res.append(User(row))
+        return res
