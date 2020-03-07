@@ -11,8 +11,8 @@ from constants import Database, Commands, DatabaseQueries
 dbConnection = sqlite3.connect('users.db', uri=True, check_same_thread=False)
 
 c = dbConnection.cursor()
-c.execute(DatabaseQueries.CREATE_TABLE_USERS_IF_NOT_EXISTS)
-c.execute(DatabaseQueries.CREATE_TABLE_GUILDS_IF_NOT_EXISTS)
+c.execute(DatabaseQueries.CREATE_USERS_TABLE)
+c.execute(DatabaseQueries.CREATE_GUILDS_TABLE)
 
 dbConnection.commit()
 
@@ -44,9 +44,9 @@ class Guild:
 def create_user(telegram_id):
     with dbLock:
         #       c.execute('''DELETE FROM users WHERE telegram_id="%s"''' % (telegram_id))
-        c.execute(DatabaseQueries.DELETE_FROM_USERS_WHERE_TELEGRAM_ID(telegram_id))
+        c.execute(DatabaseQueries.DELETE_USER_BY_ID(telegram_id))
 #       c.execute('''INSERT INTO users (telegram_id) VALUES ("%s")''' % (telegram_id))
-        c.execute(DatabaseQueries.INSERT_INTO_USERS_WHERE_TELEGRAM_ID(telegram_id))
+        c.execute(DatabaseQueries.CREATE_USER_WITH_ID(telegram_id))
         dbConnection.commit()
 
 
@@ -54,7 +54,7 @@ def update_user(telegram_id, field, value):
 
     with dbLock:
         #       c.execute('''UPDATE users SET %s="%s" WHERE telegram_id="%s"''' % (field, value, telegram_id))
-        c.execute(DatabaseQueries.UPDATE_USERS_SET_WHERE_TELEGRAM_ID(
+        c.execute(DatabaseQueries.UPDATE_USER_FIELD(
             field, value, telegram_id))
         dbConnection.commit()
 
@@ -63,8 +63,7 @@ def insert_guild(guild_name):
 
     with dbLock:
         #       c.execute('''UPDATE users SET %s="%s" WHERE telegram_id="%s"''' % (field, value, telegram_id))
-        c.execute(DatabaseQueries.INSERT_INTO_GUILDS_SET_WHERE_GUILD_NAME(
-            guild_name))
+        c.execute(DatabaseQueries.ADD_GUILD_WITH_NAME(guild_name))
         dbConnection.commit()
 
 
@@ -85,15 +84,15 @@ def get_all_guilds():
 def set_subscription(telegram_id, isSubscribed):
     with dbLock:
         #       c.execute('''UPDATE users set subscribed=%d WHERE telegram_id="%s"''' % (isSubscribed, telegram_id))
-        c.execute(DatabaseQueries.UPDATE_USERS_SET_SUBSCRIBED_WHERE_TELEGRAM_ID(
+        c.execute(DatabaseQueries.UPDATE_USER_SUBSCRIPTION_FLAG(
             isSubscribed, telegram_id))
         dbConnection.commit()
 
 
 def get_subscribed_users():
     with dbLock:
-        #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
-        c.execute(DatabaseQueries.SELECT_ALL_FROM_USERS_WHERE_SUBSCRIBED)
+        #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.USER_SUBSCRIBED))
+        c.execute(DatabaseQueries.SELECT_ALL_SUBSCRIBED_USERS)
 
         rows = c.fetchall()
         res = list()
@@ -107,7 +106,7 @@ def get_user(telegram_id):
     with dbLock:
         #       c.execute('''SELECT * FROM users WHERE telegram_id="%s"''' % (telegram_id))
         c.execute(
-            DatabaseQueries.SELECT_ALL_FROM_USERS_WHERE_TELEGRAM_ID(telegram_id))
+            DatabaseQueries.SELECT_USER_BY_TELEGRAM_ID(telegram_id))
         user = c.fetchone()
 
         if(user is None):
@@ -119,7 +118,7 @@ def get_user(telegram_id):
 def remove_user(telegram_id):
     with dbLock:
         #       c.execute('''DELETE FROM users WHERE telegram_id="%s"''' % (telegram_id))
-        c.execute(DatabaseQueries.DELETE_FROM_USERS_WHERE_TELEGRAM_ID(telegram_id))
+        c.execute(DatabaseQueries.DELETE_USER_BY_ID(telegram_id))
 
         dbConnection.commit()
 
