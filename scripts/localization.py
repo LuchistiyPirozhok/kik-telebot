@@ -1,5 +1,5 @@
 from constants import Statuses
-from types import List
+from typing import List
 
 StatusesMap = {
     Statuses.BANNED: 'заблокирован',
@@ -62,10 +62,6 @@ class Admin:
     SELECT_USER_STATUS_BY_ID = 'Введите ID пользователя:'
     SELECT_USER_STATUS_BY_ID_FAILED = 'Пользователь с таким ID не найден'
     SELECT_USER_STATUS_BY_ID_SUCCESSFUL = 'Пользователь с таким ID найден'
-    CHANGE_USER_STATUS_BY_ID = '''Введите новый статус пользователя:
-"-1" - забанить
-"2" - активировать
-                        '''
     CHANGE_USER_STATUS_BY_ID_SUCCESSFUL = 'Статус пользователя изменен'
     CHANGE_USER_STATUS_BY_ID_ADD_ADMIN = 'Вам были выданы права администратора'
     ADD_ADMIN = 'Выдать права администратора'
@@ -106,8 +102,8 @@ class Bosses:
     LETHON = 'Летона'
     YSONDRE = 'Исондру'
     TAERAR = 'Таэрара'
-    ALL = 'Слежу за всеми'
-    NONE = 'Больше не слежу'
+    ALL = 'Всех'
+    NONE = 'Никого'
 
     @staticmethod
     def getList():
@@ -132,3 +128,7 @@ class Messages:
     ALL_ADMINS = 'all_admins'
     MESSAGE_TO_ALL = 'message_to_all'
     ADD_ADMIN = 'add_admin'
+
+    @staticmethod
+    def BOSS_CHECK(boss: str):
+        return f'boss_check:{boss}'
