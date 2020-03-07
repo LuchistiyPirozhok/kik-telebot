@@ -27,6 +27,8 @@ class BossMasks:
     LETHON = 0b000001
     YSONDRE = 0b000001
     TAERAR = 0b000001
+    ALL = 0b111111
+    NONE = 0b000000
 
 
 class DatabaseQueries:
@@ -37,7 +39,9 @@ class DatabaseQueries:
               subscribed int,
               guild_name text,
               reg_code text,
-              status int default {Statuses.UNREGISTERED})'''
+              status int default {Statuses.UNREGISTERED})
+              boss_mask int default {BossMasks.NONE}
+              '''
 
     CREATE_TABLE_GUILDS_IF_NOT_EXISTS = '''CREATE TABLE IF NOT EXISTS guilds
              (guild_name text PRIMARY KEY)'''

@@ -31,6 +31,7 @@ class User:
         self.guild_name = tpl[4]
         self.reg_code = tpl[5]
         self.status = tpl[6]
+        self.boss_mask = tpl[7]
 
 
 class Guild:
