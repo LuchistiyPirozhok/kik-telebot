@@ -1,3 +1,8 @@
+from typing import List
+from database import User
+from constants import Database, Commands, Statuses
+from localization import LocaleExceptions, Locale, Bosses, Messages, BossCheck, Admin
+
 import telebot
 import os
 import database
@@ -6,11 +11,6 @@ import botutils
 import random
 
 from telebot import types
-from localization import LocaleExceptions, Locale, Bosses, Messages, Admin
-from constants import Database, Commands, Statuses
-from database import User
-
-from typing import List
 
 TELEBOT_ENV_VARIABLE = 'KIK_TELEBOT_API_KEY'
 
@@ -123,7 +123,9 @@ def send_menu_by_user(user):
         Bosses.EMERISS: Bosses.EMERISS,
         Bosses.LETHON: Bosses.LETHON,
         Bosses.YSONDRE: Bosses.YSONDRE,
-        Bosses.TAERAR: Bosses.TAERAR
+        Bosses.TAERAR: Bosses.TAERAR,
+        BossCheck.BEGIN_CHECKING: BossCheck.BEGIN_CHECKING,
+        BossCheck.CHECK_LIST:  BossCheck.CHECK_LIST
     }
 
     if user.subscribed == Database.USER_SUBSCRIBED:
@@ -349,6 +351,11 @@ def callback_worker(call):
 
     elif call.data in Bosses.getList():
         notify_all(call.data, call.from_user.id)
+    elif call.data == BossCheck.BEGIN_CHECKING:
+        user = database.get_user(call.from_user.id)
+        keyboard = {
+
+        }
 
 
 def notify_all(boss, by):
