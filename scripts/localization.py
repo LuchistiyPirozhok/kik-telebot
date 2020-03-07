@@ -91,6 +91,9 @@ class LocaleExceptions:
 
 
 class BossCheck:
+    BEGIN_CHECKING = 'Встать в караул'
+    CHECK_LIST = 'Кто в карауле'
+
     @staticmethod
     def NOBODY(boss_name: str):
         return f'Похоже никто не следит за появлением {boss_name}'
@@ -103,6 +106,8 @@ class Bosses:
     LETHON = 'Летона'
     YSONDRE = 'Исондру'
     TAERAR = 'Таэрара'
+    ALL = 'Слежу за всеми'
+    NONE = 'Больше не слежу'
 
     @staticmethod
     def getList():

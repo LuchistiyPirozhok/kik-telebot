@@ -29,8 +29,6 @@ def get_text_messages(message):
         if(user == None):
             get_telegram_id(message)
         else:
-          #          bot.send_message(message.from_user.id, Locale.DUPLICATE_CHARACTER_NAME(user.character_name))
-            # send_menu(message)
             handle_user_status(user)
     elif message.text == Commands.HELP:
         bot.send_message(message.from_user.id, Locale.BOT_HELP_MESSAGE)
@@ -85,8 +83,6 @@ def get_registration_code(user: User):
     database.update_user(user.telegram_id,
                          Database.FIELD_REG_CODE,  code)
     bot.send_message(user.telegram_id, Locale.REGISTRATION_COMPLETE(code))
- #  bot.send_message('463808631', Locale.REGISTRATION_COMPLETE_CONFIRM(user.character_name,code))
-
     database.update_user(
         user.telegram_id, Database.FIELD_STATUS, Statuses.PENDING)
     keyboard = create_confirm_user_menu(user)
@@ -122,9 +118,6 @@ def send_menu(message):
 
 def send_menu_by_user(user):
     menu = {
-        #      'Добавить гильдию': 'add_guild',
-        #       Locale.BOSS_AZUREGOS: 'Азурегос',
-        #       Locale.BOSS_KAZZAK: 'Каззак'
         Bosses.AZUREGOS: Bosses.AZUREGOS,
         Bosses.KAZZAK: Bosses.KAZZAK,
         Bosses.EMERISS: Bosses.EMERISS,
