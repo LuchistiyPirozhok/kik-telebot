@@ -20,6 +20,15 @@ class Statuses:
     SUPERVISOR = 4
 
 
+class BossMasks:
+    AZUREGOS = 0b000001
+    KAZZAK = 0b000001
+    EMERISS = 0b000001
+    LETHON = 0b000001
+    YSONDRE = 0b000001
+    TAERAR = 0b000001
+
+
 class DatabaseQueries:
     CREATE_TABLE_USERS_IF_NOT_EXISTS = f'''CREATE TABLE IF NOT EXISTS users
              (telegram_id text PRIMARY KEY,
