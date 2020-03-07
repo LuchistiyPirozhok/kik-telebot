@@ -7,20 +7,33 @@ class Database:
     FIELD_PHONE = 'phone'
     FIELD_SUBSCRIBED = 'subscribed'
     FIELD_GUILD_NAME = 'guild_name'
+    FIELD_REG_CODE = 'reg_code'
+    FIELD_STATUS = 'status'
+
+
+class Statuses:
+    BANNED = -1
+    UNREGISTERED = 0
+    PENDING = 1
+    ACTIVE = 2
+    ADMIN = 3
+    SUPERVISOR = 4
 
 
 class DatabaseQueries:
-    CREATE_TABLE_USERS_IF_NOT_EXISTS = '''CREATE TABLE IF NOT EXISTS users
+    CREATE_TABLE_USERS_IF_NOT_EXISTS = f'''CREATE TABLE IF NOT EXISTS users
              (telegram_id text PRIMARY KEY,
               character_name text,
               phone text,
               subscribed int,
-              guild_name text)'''
+              guild_name text,
+              reg_code text,
+              status int default {Statuses.UNREGISTERED})'''
 
     CREATE_TABLE_GUILDS_IF_NOT_EXISTS = '''CREATE TABLE IF NOT EXISTS guilds
              (guild_name text PRIMARY KEY)'''
 
-    SELECT_ALL_FROM_USERS_WHERE_SUBSCRIBED = f'SELECT * FROM users WHERE subscribed={Database.DB_USER_SUBSCRIBED}'
+    SELECT_ALL_FROM_USERS_WHERE_SUBSCRIBED = f'SELECT * FROM users WHERE subscribed={Database.DB_USER_SUBSCRIBED} and status>={Statuses.ACTIVE}'
 
     SELECT_ALL_FROM_GUILDS = 'SELECT * FROM guilds'
 
