@@ -2,11 +2,9 @@
 import sqlite3
 import os
 
-from constants import Database
-
 from threading import RLock
 
-from constants import Database, Commands, DatabaseQueries
+from constants import DatabaseQueries
 
 dbConnection = sqlite3.connect('users.db', uri=True, check_same_thread=False)
 
