@@ -34,8 +34,11 @@ class DatabaseQueries:
              (guild_name text PRIMARY KEY)'''
 
     SELECT_ALL_FROM_USERS_WHERE_SUBSCRIBED = f'SELECT * FROM users WHERE subscribed={Database.DB_USER_SUBSCRIBED} and status>={Statuses.ACTIVE}'
-
+    SELECT_ALL_FROM_USERS = 'SELECT * FROM users'
     SELECT_ALL_FROM_GUILDS = 'SELECT * FROM guilds'
+    SELECT_ALL_FROM_USERS_WHERE_STATUS_PENDING=f'SELECT * FROM users WHERE status="{Statuses.PENDING}"'
+    SELECT_ALL_FROM_USERS_WHERE_STATUS_BANNED=f'SELECT * FROM users WHERE status="{Statuses.BANNED}"'
+    SELECT_ALL_FROM_USERS_WHERE_STATUS_ADMIN=f'SELECT * FROM users WHERE status>={Statuses.ADMIN}'
 
     @staticmethod
     def DELETE_FROM_USERS_WHERE_TELEGRAM_ID(telegram_id: str):
