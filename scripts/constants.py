@@ -9,6 +9,7 @@ class Database:
     FIELD_GUILD_NAME = 'guild_name'
     FIELD_REG_CODE = 'reg_code'
     FIELD_STATUS = 'status'
+    FIELD_BOSS_MASK = 'boss_mask'
 
 
 class Statuses:
@@ -78,6 +79,36 @@ class DatabaseQueries:
     @staticmethod
     def ADD_GUILD_WITH_NAME(guild_name: str):
         return f'INSERT INTO guilds (guild_name) VALUES ("{guild_name}")'
+
+    @staticmethod
+    def TOGGLE_BOSSES_BY_MASK(telegram_id: str, boss_mask: int):
+        '''
+        We are using xor operation here to toggle bits by mask.
+
+        e.g boss_mask = 0b001
+            user.boss_mask = 0b100
+
+           new_mask = user.boss_mask xor boss_mask = 0b101
+
+        if we xor new mask again
+            new_mask xor boss_mask = 0b101 xor 0b001 = 0b001
+
+        Since sqlite3 doesn't support a xor operation we emulate it
+        with (a or b) - (a and b) (a.k.a (a | b)-(a & b)) 
+        '''
+
+        return f'''UPDATE users SET {Database.FIELD_BOSS_MASK}=
+            ({Database.FIELD_BOSS_MASK}|{boss_mask})-
+            ({Database.FIELD_BOSS_MASK}&{boss_mask})
+            WHERE {Database.FIELD_TELEGRAM_ID}={telegram_id}
+        '''
+
+    @staticmethod
+    def SELECT_USERS_BY_MASK(boss_mask: int):
+        '''
+        Wes use bitwise and to find users with needed boss bit setted up
+        '''
+        return f' SELECT * FROM users WHERE boss_mask & {boss_mask}'
 
 
 class Commands:
