@@ -28,6 +28,9 @@ class User:
         self.character_name = tpl[1]
         self.phone = tpl[2]
         self.subscribed = tpl[3]
+        self.guild_name = tpl[4]
+        self.reg_code = tpl[5]
+        self.status = tpl[6]
 
 
 class Guild:
