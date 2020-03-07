@@ -33,15 +33,16 @@ class BossMasks:
 
 class DatabaseQueries:
     CREATE_TABLE_USERS_IF_NOT_EXISTS = f'''CREATE TABLE IF NOT EXISTS users
-             (telegram_id text PRIMARY KEY,
+            (
+              telegram_id text PRIMARY KEY,
               character_name text,
               phone text,
               subscribed int,
               guild_name text,
               reg_code text,
-              status int default {Statuses.UNREGISTERED})
+              status int default {Statuses.UNREGISTERED},
               boss_mask int default {BossMasks.NONE}
-              '''
+            )'''
 
     CREATE_TABLE_GUILDS_IF_NOT_EXISTS = '''CREATE TABLE IF NOT EXISTS guilds
              (guild_name text PRIMARY KEY)'''
