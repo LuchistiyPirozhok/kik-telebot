@@ -14,7 +14,6 @@ c.execute(DatabaseQueries.CREATE_GUILDS_TABLE)
 
 dbConnection.commit()
 
-
 dbLock = RLock()
 
 
