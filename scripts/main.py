@@ -1,6 +1,6 @@
 from typing import List
 from database import User
-from constants import Database, Commands, Statuses
+from constants import Database, Commands, Statuses, BossMasks
 from localization import LocaleExceptions, Locale, Bosses, Messages, BossCheck, Admin
 
 import telebot
@@ -192,13 +192,11 @@ def handle_admin_click(call):
 
     elif call.data == Messages.ALL_USERS:
         users = database.get_all_users()
-        # botutils.format_user_list_asshole_html_table(users)
         bot.send_message(chat_id=call.from_user.id, text=botutils.format_users_as_table(
             users), parse_mode='Markdown')
 
     elif call.data == Messages.ALL_GUILDS:
         guilds = database.get_all_guilds()
-        # botutils.format_user_list_asshole_html_table(users)
         bot.send_message(chat_id=call.from_user.id, text=botutils.format_guilds_as_table(
             guilds), parse_mode='Markdown')
 
@@ -207,7 +205,6 @@ def handle_admin_click(call):
         if len(pending_users) == 0:
             bot.send_message(call.from_user.id, Admin.USERS_EMPTY)
         else:
-            # botutils.format_user_list_asshole_html_table(users)
             bot.send_message(chat_id=call.from_user.id, text=botutils.format_users_as_table(
                 pending_users), parse_mode='Markdown')
 
@@ -216,7 +213,6 @@ def handle_admin_click(call):
         if len(banned_users) == 0:
             bot.send_message(call.from_user.id, Admin.USERS_EMPTY)
         else:
-            # botutils.format_user_list_asshole_html_table(users)
             bot.send_message(chat_id=call.from_user.id, text=botutils.format_users_as_table(
                 banned_users), parse_mode='Markdown')
 
@@ -225,7 +221,6 @@ def handle_admin_click(call):
         if len(all_admins) == 0:
             bot.send_message(call.from_user.id, Admin.USERS_EMPTY)
         else:
-            # botutils.format_user_list_asshole_html_table(users)
             bot.send_message(chat_id=call.from_user.id, text=botutils.format_users_as_table(
                 all_admins), parse_mode='Markdown')
 
@@ -278,7 +273,6 @@ def handle_admin_click(call):
         notify_all_admins_about_delete(call.from_user.id, user_id)
         database.remove_user(user_id)
         bot.send_message(user_id, Locale.CHARACTER_REG_FAILED)
-#        bot.send_message(call.from_user.id, Admin.CHANGE_USER_STATUS_BY_ID_SUCCESSFUL)
 
     elif call.data == Messages.ADMIN:
         database.set_subscription(
@@ -309,12 +303,11 @@ def user_id_exists(message):
         bot.send_message(message.from_user.id,
                          Admin.SELECT_USER_STATUS_BY_ID_FAILED)
     elif admin_user.status == Statuses.ADMIN and user.status in [Statuses.ACTIVE, Statuses.BANNED, Statuses.PENDING]:
-      #  bot.send_message(message.from_user.id, Admin.SELECT_USER_STATUS_BY_ID_SUCCESSFUL)
         keyboard = create_confirm_user_menu(user)
         bot.send_message(message.from_user.id, Admin.SELECT_USER_STATUS_BY_ID_SUCCESSFUL,
                          reply_markup=keyboard)
     elif admin_user.status == Statuses.SUPERVISOR:
-      #  bot.send_message(message.from_user.id, Admin.SELECT_USER_STATUS_BY_ID_SUCCESSFUL)
+
         keyboard = create_confirm_user_menu(user)
         botutils.add_keys(keyboard, {
             Admin.ADD_ADMIN: f'{Messages.ADD_ADMIN}:{user.telegram_id}',
@@ -323,7 +316,6 @@ def user_id_exists(message):
                          reply_markup=keyboard)
     else:
         bot.send_message(message.from_user.id, Admin.NO_PERMITTIONS)
-        # U have no permission
 
 
 def create_confirm_user_menu(user: User):
@@ -352,10 +344,23 @@ def callback_worker(call):
     elif call.data in Bosses.getList():
         notify_all(call.data, call.from_user.id)
     elif call.data == BossCheck.BEGIN_CHECKING:
-        user = database.get_user(call.from_user.id)
-        keyboard = {
+        send_check_menu(call.from_user.id)
 
-        }
+    elif call.data == BossCheck.CHECK_LIST:
+        text = ''
+        for boss_mask in BossMasks.boss_list():
+            text += f'{BossCheck.CHECK(boss_mask,database.get_users_by_mask(boss_mask))}\n\n'
+
+        bot.send_message(call.from_user.id, text)
+
+    elif call.data.startswith(Messages.CHECK):
+        boss_mask = int(call.data.split(':')[1])
+        if(boss_mask in [BossMasks.ALL, BossMasks.NONE]):
+            database.update_user(
+                call.from_user.id, Database.FIELD_BOSS_MASK, boss_mask)
+        else:
+            database.toggle_user_mask(boss_mask, call.from_user.id)
+        send_check_menu(call.from_user.id)
 
 
 def notify_all(boss, by):
@@ -368,6 +373,18 @@ def notify_all(boss, by):
                              Locale.BOSS_NOTIFICATION(user.character_name, boss))
 
 #################
+
+
+def send_check_menu(telegram_id: str):
+    user = database.get_user(telegram_id)
+    keyboard = {}
+
+    for boss_mask in BossMasks.get_list():
+        btn_text = botutils.format_boss_check_button_text(boss_mask, user)
+        keyboard[btn_text] = f'{Messages.CHECK}:{boss_mask}'
+
+    bot.send_message(telegram_id, BossCheck.WILL_NOTIFY,
+                     reply_markup=botutils.create_menu(keyboard))
 
 
 def notify_all_admins(admin_id, user_id):
