@@ -1,5 +1,6 @@
-from constants import Statuses
+from constants import Statuses, BossMasks
 from typing import List
+from database import User
 
 StatusesMap = {
     Statuses.BANNED: 'заблокирован',
@@ -9,27 +10,26 @@ StatusesMap = {
 
 
 class Locale:
-    CHARACTER_NAME = '''Введите имя вашего основного персонажа:'''
-    GUILD_NAME = '''Введите название гильдии'''
-    BOT_HELP_MESSAGE = '''/start - регистрация
-/menu - показать меню
-                        '''
-    BOT_MENU_MESSAGE = '''Меню Kik-Notify:'''
-    BOT_ADMIN_MENU = '''Административная часть'''
-    CHARACTER_SUBCRIPTION = '''Подписаться'''
-    CHARACTER_UNSUBCRIPTION = '''Отписаться'''
-    CHARACTER_GUILD = '''В какой гильдии вы состоите?'''
-    CHARACTER_QUESTION_ABOUT_SUBCRIPTION = '''Вы хотите подписаться на уведомления?'''
-    CHARACTER_SUCCESSFUL_SUBCRIPTION = '''Вы подписались на уведомления'''
-    CHARACTER_SUCCESSFUL_UNSUBCRIPTION = '''Вы отписались от уведомлений'''
+    CHARACTER_NAME = 'Введите имя вашего основного персонажа:'
+    GUILD_NAME = 'Введите название гильдии'
+    BOT_HELP_MESSAGE = ('/start - регистрация\n'
+                        '/menu - показать меню\n')
+    BOT_MENU_MESSAGE = 'Меню Kik-Notify:'
+    BOT_ADMIN_MENU = 'Административная часть'
+    CHARACTER_SUBCRIPTION = 'Подписаться'
+    CHARACTER_UNSUBCRIPTION = 'Отписаться'
+    CHARACTER_GUILD = 'В какой гильдии вы состоите?'
+    CHARACTER_QUESTION_ABOUT_SUBCRIPTION = 'Вы хотите подписаться на уведомления?'
+    CHARACTER_SUCCESSFUL_SUBCRIPTION = 'Вы подписались на уведомления'
+    CHARACTER_SUCCESSFUL_UNSUBCRIPTION = 'Вы отписались от уведомлений'
     CONFIRM = 'Зарегистрировать пользователя'
     NOT_CONFIRM = 'Забанить пользователя'
     DELETE = 'Удалить пользователя из БД'
     REGISTER_FIRST = 'Сначала необходимо завершить реигстрацию'
-    CHARACTER_REG_SUCCESSFUL = '''Вам были выданы права пользователя'''
-    CHARACTER_REG_FAILED = '''К сожалению, вы не прошли регистрацию из-за ошибок в имени персонажа или выборе гильдии. Пожалуйста, попробуйте зарегистрироваться снова'''
-    CHARACTER_REG_BANNED = '''К сожалению, вы были заблокированы. По всем вопросам обращайтесь к администратору в дискорде'''
-    CHARACTER_REG_PENDING = '''Заявка на регистрацию уже была отправлена. Пожалуйста, ожидайте ее подтверждения'''
+    CHARACTER_REG_SUCCESSFUL = 'Вам были выданы права пользователя'
+    CHARACTER_REG_FAILED = 'К сожалению, вы не прошли регистрацию из-за ошибок в имени персонажа или выборе гильдии. Пожалуйста, попробуйте зарегистрироваться снова'
+    CHARACTER_REG_BANNED = 'К сожалению, вы были заблокированы. По всем вопросам обращайтесь к администратору в дискорде'
+    CHARACTER_REG_PENDING = 'Заявка на регистрацию уже была отправлена. Пожалуйста, ожидайте ее подтверждения'
 
     @staticmethod
     def BOSS_NOTIFICATION(user_name, boss_name):
@@ -86,15 +86,6 @@ class LocaleExceptions:
     ENVIRONMENT_API_KEY_NOT_FOUND = '''Environment variable KIK_TELEBOT_API_KEY aren't present'''
 
 
-class BossCheck:
-    BEGIN_CHECKING = 'Встать в караул'
-    CHECK_LIST = 'Кто в карауле'
-
-    @staticmethod
-    def NOBODY(boss_name: str):
-        return f'Похоже никто не следит за появлением {boss_name}'
-
-
 class Bosses:
     AZUREGOS = 'Азурегоса'
     KAZZAK = 'Каззака'
@@ -108,6 +99,38 @@ class Bosses:
     @staticmethod
     def getList():
         return [Bosses.AZUREGOS, Bosses.KAZZAK, Bosses.EMERISS, Bosses.LETHON, Bosses.YSONDRE, Bosses.TAERAR]
+
+
+BossMaskMap = {
+    BossMasks.AZUREGOS: Bosses.AZUREGOS,
+    BossMasks.KAZZAK: Bosses.KAZZAK,
+    BossMasks.EMERISS: Bosses.EMERISS,
+    BossMasks.LETHON: Bosses.LETHON,
+    BossMasks.YSONDRE: Bosses.YSONDRE,
+    BossMasks.TAERAR: Bosses.TAERAR,
+    BossMasks.ALL: Bosses.ALL,
+    BossMasks.NONE: Bosses.NONE
+}
+
+
+class BossCheck:
+    BEGIN_CHECKING = 'Встать в караул'
+    CHECK_LIST = 'Кто в карауле'
+    WILL_NOTIFY = 'Я буду оповещать о появлении'
+
+    @staticmethod
+    def NOBODY(boss_name: str):
+        return f'Похоже никто не следит за появлением {boss_name}'
+
+    @staticmethod
+    def CHECK(boss_mask: int, users: List[User]):
+        if(len(users) == 0):
+            return BossCheck.NOBODY(BossMaskMap[boss_mask])
+
+        user_names = map(lambda u: u.character_name, users)
+        user_list = ','.join(user_names)
+
+        return f'За появлением {BossMaskMap[boss_mask]} следит(ят):\n {user_list}'
 
 
 class Messages:
@@ -128,6 +151,7 @@ class Messages:
     ALL_ADMINS = 'all_admins'
     MESSAGE_TO_ALL = 'message_to_all'
     ADD_ADMIN = 'add_admin'
+    CHECK = 'check_boss'
 
     @staticmethod
     def BOSS_CHECK(boss: str):
