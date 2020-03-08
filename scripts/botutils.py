@@ -1,5 +1,5 @@
 from database import Guild, User
-from localization import Bosses
+from localization import Bosses, BossMaskMap
 from constants import BossMasks
 from typing import Callable, List, Dict
 from database import Guild, User
@@ -56,6 +56,7 @@ def format_users_as_table(users: List[User]):
                 f"`{set_lng('Гильдия: ',12)}`{user.guild_name}\n"
                 f"`{set_lng('Код: ',12)}`{user.reg_code}\n"
                 f"`{set_lng('Статус: ',12)}`{user.status}\n"
+                f"`{set_lng('Чекает: ',12)}`{user.boss_mask}\n"
                 )
 
     users_as_table_rows = map(lambda u: map_user_to_table_string(u), users)
@@ -76,14 +77,9 @@ def format_guilds_as_table(guilds: List[Guild]):
 
 
 def is_user_checking_boss(boss_mask: int, user: User):
-    return boss_mask & user.boss_mask == boss_mask
+    return boss_mask > 0 and (boss_mask & user.boss_mask == boss_mask)
 
 
 def format_boss_check_button_text(boss_mask: int, user: User):
-    #  AZUREGOS = 0b000001
-    # KAZZAK = 0b000010
-    # EMERISS = 0b000100
-    # LETHON = 0b001000
-    # YSONDRE = 0b010000
-    # TAERAR = 0b100000
-    text = Bosses.TAERAR
+    text = BossMaskMap[boss_mask]
+    return f'{set_lng(text,15)}{"✓" if is_user_checking_boss(boss_mask,user) else ""}'
