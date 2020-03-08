@@ -119,10 +119,11 @@ def remove_user(telegram_id):
 
         dbConnection.commit()
 
+
 def get_all_users():
     with dbLock:
         #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
-        c.execute(DatabaseQueries.SELECT_ALL_FROM_USERS)
+        c.execute(DatabaseQueries.SELECT_ALL_USERS)
 
         rows = c.fetchall()
         res = list()
@@ -130,23 +131,25 @@ def get_all_users():
         for row in rows:
             res.append(User(row))
         return res
+
 
 def get_all_pending_users():
     with dbLock:
         #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
-        c.execute(DatabaseQueries.SELECT_ALL_FROM_USERS_WHERE_STATUS_PENDING)
-#проверить на наличие
+        c.execute(DatabaseQueries.SELECT_ALL_USERS_WHERE_STATUS_PENDING)
+# проверить на наличие
         rows = c.fetchall()
         res = list()
 
         for row in rows:
             res.append(User(row))
         return res
+
 
 def get_all_banned_users():
     with dbLock:
         #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
-        c.execute(DatabaseQueries.SELECT_ALL_FROM_USERS_WHERE_STATUS_BANNED)
+        c.execute(DatabaseQueries.SELECT_ALL_USERS_WHERE_STATUS_BANNED)
 
         rows = c.fetchall()
         res = list()
@@ -155,10 +158,30 @@ def get_all_banned_users():
             res.append(User(row))
         return res
 
+
 def get_all_admins():
     with dbLock:
         #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
-        c.execute(DatabaseQueries.SELECT_ALL_FROM_USERS_WHERE_STATUS_ADMIN)
+        c.execute(DatabaseQueries.SELECT_ALL_USERS_WHERE_STATUS_ADMIN)
+
+        rows = c.fetchall()
+        res = list()
+
+        for row in rows:
+            res.append(User(row))
+        return res
+
+
+def toggle_user_mask(boss_mask: int, telegram_id: str):
+    with dbLock:
+        c.execute(DatabaseQueries.TOGGLE_BOSSES_BY_MASK(
+            telegram_id, boss_mask))
+        dbConnection.commit()
+
+
+def get_users_by_mask(boss_mask: int):
+    with dbLock:
+        c.execute(DatabaseQueries.SELECT_USERS_BY_MASK(boss_mask))
 
         rows = c.fetchall()
         res = list()
