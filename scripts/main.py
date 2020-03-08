@@ -80,6 +80,7 @@ def get_user_guild(message):
 
 def get_registration_code(user: User):
     code = random_digits()
+    admins = database.get_all_admins()
     database.update_user(user.telegram_id,
                          Database.FIELD_REG_CODE,  code)
     bot.send_message(user.telegram_id, Locale.REGISTRATION_COMPLETE(code))
@@ -88,8 +89,12 @@ def get_registration_code(user: User):
     keyboard = create_confirm_user_menu(user)
 
     question = Locale.REGISTRATION_COMPLETE_CONFIRM(user.character_name, code)
-    bot.send_message('463808631', text=question,
-                     reply_markup=keyboard)
+#   bot.send_message('463808631', text=question,reply_markup=keyboard)
+
+    for admin in admins:
+        if(admin.subscribed==Database.USER_SUBSCRIBED):
+            bot.send_message(admin.telegram_id,text=question,reply_markup=keyboard)
+
 
 
 def random_digits():
@@ -412,6 +417,5 @@ def notify_all_admins_about_delete(admin_id, user_id):
                              Admin.ADMIN_NOTIFICATION_DELETE_USER(admin.character_name,
                                                                   user.character_name,
                                                                   user.telegram_id))
-
 
 bot.polling(none_stop=True, interval=0)
