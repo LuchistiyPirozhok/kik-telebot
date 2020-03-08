@@ -1,22 +1,18 @@
-from telebot import types
-
-from database import Guild,User
-
+from database import Guild, User
+from localization import Bosses, BossMaskMap
+from constants import BossMasks
 from typing import Callable, List, Dict
-
-
-class DialogElement:
-    def __init__(user, message: str, responseHandler: Callable[[object], None]):
-        user.message = message
-        user.responseHandler = responseHandler
+from database import Guild, User
+from telebot import types
 
 
 def create_menu(buttons: Dict[str, str]):
     keyboard = types.InlineKeyboardMarkup()
 
-    return add_keys(keyboard,buttons)
+    return add_keys(keyboard, buttons)
 
-def add_keys(keyboard,buttons:Dict[str,str]):
+
+def add_keys(keyboard, buttons: Dict[str, str]):
     for text, data in buttons.items():
         keyboard_key = types.InlineKeyboardButton(
             text=text, callback_data=data
@@ -36,38 +32,41 @@ def create_menu_from_guilds(guilds: List[Guild]):
         keyboard.add(key)
     return keyboard
 
-def set_lng(value,n:int):
-    if(value==None):
+
+def set_lng(value, n: int):
+    if(value == None):
         return ' '*n
 
     text = str(value)
-    txt_len = len(text) 
+    txt_len = len(text)
 
     if txt_len < n:
-       diff = n - txt_len
-       text_with_space = text+' '*diff
-       return text_with_space
-    
+        diff = n - txt_len
+        text_with_space = text+' '*diff
+        return text_with_space
+
     return text
 
-def format_users_as_table(users:List[User]):
-    def map_user_to_table_string(user:User):
-        return f'''
-            `{set_lng('Персонаж:',25)}`{user.character_name}
-            `{set_lng('ID:',25)}`{user.telegram_id}
-            `{set_lng('Подписка:',25)}`{user.subscribed}
-            `{set_lng('Гильдия:',25)}`{user.guild_name}
-            `{set_lng('Код регистрации:',25)}`{user.reg_code}
-            `{set_lng('Статус:',25)}`{user.status}    
-        '''
+
+def format_users_as_table(users: List[User]):
+    def map_user_to_table_string(user: User):
+        return (f"`{set_lng('Персонаж: ',12)}`{user.character_name}\n"
+                f"`{set_lng('ID: ',12)}`{user.telegram_id}\n"
+                f"`{set_lng('Подписка: ',12)}`{user.subscribed}\n"
+                f"`{set_lng('Гильдия: ',12)}`{user.guild_name}\n"
+                f"`{set_lng('Код: ',12)}`{user.reg_code}\n"
+                f"`{set_lng('Статус: ',12)}`{user.status}\n"
+                f"`{set_lng('Чекает: ',12)}`{user.boss_mask}\n"
+                )
 
     users_as_table_rows = map(lambda u: map_user_to_table_string(u), users)
     users_as_str = "\n".join(users_as_table_rows)
     return users_as_str
 
-def format_guilds_as_table(guilds:List[Guild]):
- 
-    def map_guild_to_table_string(guild:Guild):
+
+def format_guilds_as_table(guilds: List[Guild]):
+
+    def map_guild_to_table_string(guild: Guild):
         return f'''
             `{set_lng('Гильдия:',25)}`{guild.guild_name}
         '''
@@ -75,3 +74,12 @@ def format_guilds_as_table(guilds:List[Guild]):
     guilds_as_table_rows = map(lambda u: map_guild_to_table_string(u), guilds)
     guilds_as_str = "\n".join(guilds_as_table_rows)
     return guilds_as_str
+
+
+def is_user_checking_boss(boss_mask: int, user: User):
+    return boss_mask > 0 and (boss_mask & user.boss_mask == boss_mask)
+
+
+def format_boss_check_button_text(boss_mask: int, user: User):
+    text = BossMaskMap[boss_mask]
+    return f'{set_lng(text,15)}{"✓" if is_user_checking_boss(boss_mask,user) else ""}'
