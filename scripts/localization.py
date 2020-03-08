@@ -1,3 +1,11 @@
+from constants import Statuses
+
+StatusesMap={
+    Statuses.BANNED : 'заблокирован',
+    Statuses.ACTIVE : 'пользователь',
+    Statuses.ADMIN : 'администратор'
+}
+
 class Locale:
     CHARACTER_NAME = '''Введите имя вашего основного персонажа:'''
     GUILD_NAME = '''Введите название гильдии'''
@@ -16,7 +24,7 @@ class Locale:
     NOT_CONFIRM = 'Забанить пользователя'
     DELETE = 'Удалить пользователя из БД'
     REGISTER_FIRST = 'Сначала необходимо завершить реигстрацию'
-    CHARACTER_REG_SUCCESSFUL = '''Регистрация успешно подтверждена'''
+    CHARACTER_REG_SUCCESSFUL = '''Вам были выданы права пользователя'''
     CHARACTER_REG_FAILED = '''К сожалению, вы не прошли регистрацию из-за ошибок в имени персонажа или выборе гильдии. Пожалуйста, попробуйте зарегистрироваться снова'''
     CHARACTER_REG_BANNED = '''К сожалению, вы были заблокированы. По всем вопросам обращайтесь к администратору в дискорде'''
     CHARACTER_REG_PENDING = '''Заявка на регистрацию уже была отправлена. Пожалуйста, ожидайте ее подтверждения'''
@@ -57,7 +65,7 @@ class Admin:
                         '''
     CHANGE_USER_STATUS_BY_ID_SUCCESSFUL = 'Статус пользователя изменен'        
     CHANGE_USER_STATUS_BY_ID_ADD_ADMIN = 'Вам были выданы права администратора'  
-    ADD_ADMIN = 'Добавить админа'
+    ADD_ADMIN = 'Выдать права администратора'
     NO_PERMITTIONS = 'У вас отсутствуют права на выполнение этого действия'
     MESSAGE_TEXT = 'Введите сообщение, которое будет отправлено всем активным пользователям с включенной подпиской'
     MESSAGE_TO_ALL_TITLE = 'Сообщение всем подписчикам'
@@ -66,9 +74,17 @@ class Admin:
     def MESSAGE_TO_ALL(user_name, message_to_all):
         return f'Администратор {user_name} сообщает: "{message_to_all}"'
 
+
+    @staticmethod
+    def ADMIN_NOTIFICATION(admin_name, user_name, user_id, user_status):
+        return f'Администратор {admin_name} изменил права аккаунта с именем {user_name} (ID: {user_id}). Новые права: {StatusesMap[user_status]}'
+
+    @staticmethod
+    def ADMIN_NOTIFICATION_DELETE_USER(admin_name, user_name, user_id):
+        return f'Администратор {admin_name} удалил пользователя {user_name} (ID: {user_id}).'
+
 class LocaleExceptions:
     ENVIRONMENT_API_KEY_NOT_FOUND = '''Environment variable KIK_TELEBOT_API_KEY aren't present'''
-
 
 class Bosses:
     AZUREGOS = 'Азурегоса'
