@@ -31,6 +31,30 @@ class BossMasks:
     ALL = 0b111111
     NONE = 0b000000
 
+    @staticmethod
+    def boss_list():
+        return [
+            BossMasks.AZUREGOS,
+            BossMasks.KAZZAK,
+            BossMasks.EMERISS,
+            BossMasks.LETHON,
+            BossMasks.YSONDRE,
+            BossMasks.TAERAR
+        ]
+
+    @staticmethod
+    def get_list():
+        return [
+            BossMasks.AZUREGOS,
+            BossMasks.KAZZAK,
+            BossMasks.EMERISS,
+            BossMasks.LETHON,
+            BossMasks.YSONDRE,
+            BossMasks.TAERAR,
+            BossMasks.ALL,
+            BossMasks.NONE
+        ]
+
 
 class DatabaseQueries:
     CREATE_USERS_TABLE = f'''CREATE TABLE IF NOT EXISTS users
@@ -48,13 +72,13 @@ class DatabaseQueries:
     CREATE_GUILDS_TABLE = '''CREATE TABLE IF NOT EXISTS guilds
              (guild_name text PRIMARY KEY)'''
 
-    SELECT_ALL_FROM_USERS = 'SELECT * FROM users'
+    SELECT_ALL_USERS = 'SELECT * FROM users'
     SELECT_ALL_SUBSCRIBED_USERS = f'SELECT * FROM users WHERE subscribed={Database.USER_SUBSCRIBED} and status>={Statuses.ACTIVE}'
 
     SELECT_ALL_FROM_GUILDS = 'SELECT * FROM guilds'
-    SELECT_ALL_FROM_USERS_WHERE_STATUS_PENDING = f'SELECT * FROM users WHERE status="{Statuses.PENDING}"'
-    SELECT_ALL_FROM_USERS_WHERE_STATUS_BANNED = f'SELECT * FROM users WHERE status="{Statuses.BANNED}"'
-    SELECT_ALL_FROM_USERS_WHERE_STATUS_ADMIN = f'SELECT * FROM users WHERE status>={Statuses.ADMIN}'
+    SELECT_ALL_USERS_WHERE_STATUS_PENDING = f'SELECT * FROM users WHERE status="{Statuses.PENDING}"'
+    SELECT_ALL_USERS_WHERE_STATUS_BANNED = f'SELECT * FROM users WHERE status="{Statuses.BANNED}"'
+    SELECT_ALL_USERS_WHERE_STATUS_ADMIN = f'SELECT * FROM users WHERE status>={Statuses.ADMIN}'
 
     @staticmethod
     def DELETE_USER_BY_ID(telegram_id: str):
