@@ -1,3 +1,8 @@
+from typing import List
+from database import User
+from constants import Database, Commands, Statuses, BossMasks
+from localization import LocaleExceptions, Locale, Bosses, Messages, BossCheck, Admin
+
 import telebot
 import os
 import database
@@ -6,11 +11,6 @@ import botutils
 import random
 
 from telebot import types
-from localization import LocaleExceptions, Locale, Bosses, Messages, Admin
-from constants import Database, Commands, Statuses
-from database import User
-
-from typing import List
 
 TELEBOT_ENV_VARIABLE = 'KIK_TELEBOT_API_KEY'
 
@@ -29,8 +29,6 @@ def get_text_messages(message):
         if(user == None):
             get_telegram_id(message)
         else:
-          #          bot.send_message(message.from_user.id, Locale.DUPLICATE_CHARACTER_NAME(user.character_name))
-            # send_menu(message)
             handle_user_status(user)
     elif message.text == Commands.HELP:
         bot.send_message(message.from_user.id, Locale.BOT_HELP_MESSAGE)
@@ -85,8 +83,6 @@ def get_registration_code(user: User):
     database.update_user(user.telegram_id,
                          Database.FIELD_REG_CODE,  code)
     bot.send_message(user.telegram_id, Locale.REGISTRATION_COMPLETE(code))
- #  bot.send_message('463808631', Locale.REGISTRATION_COMPLETE_CONFIRM(user.character_name,code))
-
     database.update_user(
         user.telegram_id, Database.FIELD_STATUS, Statuses.PENDING)
     keyboard = create_confirm_user_menu(user)
@@ -122,18 +118,17 @@ def send_menu(message):
 
 def send_menu_by_user(user):
     menu = {
-        #      'Добавить гильдию': 'add_guild',
-        #       Locale.BOSS_AZUREGOS: 'Азурегос',
-        #       Locale.BOSS_KAZZAK: 'Каззак'
         Bosses.AZUREGOS: Bosses.AZUREGOS,
         Bosses.KAZZAK: Bosses.KAZZAK,
         Bosses.EMERISS: Bosses.EMERISS,
         Bosses.LETHON: Bosses.LETHON,
         Bosses.YSONDRE: Bosses.YSONDRE,
-        Bosses.TAERAR: Bosses.TAERAR
+        Bosses.TAERAR: Bosses.TAERAR,
+        BossCheck.BEGIN_CHECKING: BossCheck.BEGIN_CHECKING,
+        BossCheck.CHECK_LIST:  BossCheck.CHECK_LIST
     }
 
-    if user.subscribed == Database.DB_USER_SUBSCRIBED:
+    if user.subscribed == Database.USER_SUBSCRIBED:
         menu[Locale.CHARACTER_UNSUBCRIPTION] = Messages.UNSUBSCRIBE
     else:
         menu[Locale.CHARACTER_SUBCRIPTION] = Messages.SUBSCRIBE
@@ -181,9 +176,6 @@ def handle_unregistered_click(call):
 def handle_admin_click(call):
     if call.data == Messages.ADMIN:
         menu = {
-            #      'Добавить гильдию': 'add_guild',
-            #       Locale.BOSS_AZUREGOS: 'Азурегос',
-            #       Locale.BOSS_KAZZAK: 'Каззак'
             Admin.ALL_USERS: Messages.ALL_USERS,
             Admin.ALL_GUILDS: Messages.ALL_GUILDS,
             Admin.ALL_PENDUNG_USERS: Messages.ALL_PENDUNG_USERS,
@@ -196,41 +188,41 @@ def handle_admin_click(call):
 
         question = Locale.BOT_ADMIN_MENU
         bot.send_message(call.from_user.id, text=question,
-                     reply_markup=botutils.create_menu(menu))
+                         reply_markup=botutils.create_menu(menu))
 
     elif call.data == Messages.ALL_USERS:
         users = database.get_all_users()
-        #botutils.format_user_list_asshole_html_table(users)
-        bot.send_message(chat_id=call.from_user.id,text=botutils.format_users_as_table(users), parse_mode='Markdown')
+        bot.send_message(chat_id=call.from_user.id, text=botutils.format_users_as_table(
+            users), parse_mode='Markdown')
 
     elif call.data == Messages.ALL_GUILDS:
         guilds = database.get_all_guilds()
-        #botutils.format_user_list_asshole_html_table(users)
-        bot.send_message(chat_id=call.from_user.id,text=botutils.format_guilds_as_table(guilds), parse_mode='Markdown')
+        bot.send_message(chat_id=call.from_user.id, text=botutils.format_guilds_as_table(
+            guilds), parse_mode='Markdown')
 
     elif call.data == Messages.ALL_PENDUNG_USERS:
         pending_users = database.get_all_pending_users()
         if len(pending_users) == 0:
             bot.send_message(call.from_user.id, Admin.USERS_EMPTY)
         else:
-            #botutils.format_user_list_asshole_html_table(users)
-            bot.send_message(chat_id=call.from_user.id,text=botutils.format_users_as_table(pending_users), parse_mode='Markdown')
+            bot.send_message(chat_id=call.from_user.id, text=botutils.format_users_as_table(
+                pending_users), parse_mode='Markdown')
 
     elif call.data == Messages.ALL_BANNED_USERS:
         banned_users = database.get_all_banned_users()
         if len(banned_users) == 0:
             bot.send_message(call.from_user.id, Admin.USERS_EMPTY)
         else:
-            #botutils.format_user_list_asshole_html_table(users)
-            bot.send_message(chat_id=call.from_user.id,text=botutils.format_users_as_table(banned_users), parse_mode='Markdown')
+            bot.send_message(chat_id=call.from_user.id, text=botutils.format_users_as_table(
+                banned_users), parse_mode='Markdown')
 
     elif call.data == Messages.ALL_ADMINS:
         all_admins = database.get_all_admins()
         if len(all_admins) == 0:
             bot.send_message(call.from_user.id, Admin.USERS_EMPTY)
         else:
-            #botutils.format_user_list_asshole_html_table(users)
-            bot.send_message(chat_id=call.from_user.id,text=botutils.format_users_as_table(all_admins), parse_mode='Markdown')
+            bot.send_message(chat_id=call.from_user.id, text=botutils.format_users_as_table(
+                all_admins), parse_mode='Markdown')
 
     elif call.data == Messages.ADD_GUILD:
         bot.send_message(call.from_user.id, Locale.GUILD_NAME)
@@ -238,20 +230,24 @@ def handle_admin_click(call):
 
 ###
     elif call.data == Messages.MESSAGE_TO_ALL:
-         bot.send_message(call.from_user.id, Admin.MESSAGE_TEXT)
-         bot.register_next_step_handler_by_chat_id(call.from_user.id, message_to_subcribed_users)
+        bot.send_message(call.from_user.id, Admin.MESSAGE_TEXT)
+        bot.register_next_step_handler_by_chat_id(
+            call.from_user.id, message_to_subcribed_users)
 
 ###
     elif call.data == Messages.CHANGE_USER_STATUS:
         bot.send_message(call.from_user.id, Admin.SELECT_USER_STATUS_BY_ID)
-        bot.register_next_step_handler_by_chat_id(call.from_user.id, user_id_exists)
+        bot.register_next_step_handler_by_chat_id(
+            call.from_user.id, user_id_exists)
 
     elif call.data.startswith(Messages.ADD_ADMIN):
         user_id = call.data.split(':')[1]
         database.update_user(
             user_id, Database.FIELD_STATUS, Statuses.ADMIN)
         bot.send_message(user_id, Admin.CHANGE_USER_STATUS_BY_ID_ADD_ADMIN)
-        bot.send_message(call.from_user.id, Admin.CHANGE_USER_STATUS_BY_ID_SUCCESSFUL)
+        bot.send_message(call.from_user.id,
+                         Admin.CHANGE_USER_STATUS_BY_ID_SUCCESSFUL)
+        notify_all_admins(call.from_user.id, user_id)
 
     elif call.data.startswith(Messages.CONFIRM):
         user_id = call.data.split(':')[1]
@@ -259,20 +255,24 @@ def handle_admin_click(call):
             user_id, Database.FIELD_STATUS, Statuses.ACTIVE)
         bot.send_message(user_id, Locale.CHARACTER_REG_SUCCESSFUL)
         ask_for_subscription_by_userid(user_id)
-        bot.send_message(call.from_user.id, Admin.CHANGE_USER_STATUS_BY_ID_SUCCESSFUL)
+        bot.send_message(call.from_user.id,
+                         Admin.CHANGE_USER_STATUS_BY_ID_SUCCESSFUL)
+        notify_all_admins(call.from_user.id, user_id)
 
     elif call.data.startswith(Messages.NOT_CONFIRM):
         user_id = call.data.split(':')[1]
         database.update_user(
             user_id, Database.FIELD_STATUS, Statuses.BANNED)
         bot.send_message(user_id, Locale.CHARACTER_REG_BANNED)
-        bot.send_message(call.from_user.id, Admin.CHANGE_USER_STATUS_BY_ID_SUCCESSFUL)
+        bot.send_message(call.from_user.id,
+                         Admin.CHANGE_USER_STATUS_BY_ID_SUCCESSFUL)
+        notify_all_admins(call.from_user.id, user_id)
 
     elif call.data.startswith(Messages.DELETE):
         user_id = call.data.split(':')[1]
+        notify_all_admins_about_delete(call.from_user.id, user_id)
         database.remove_user(user_id)
         bot.send_message(user_id, Locale.CHARACTER_REG_FAILED)
-        bot.send_message(call.from_user.id, Admin.CHANGE_USER_STATUS_BY_ID_SUCCESSFUL)
 
     elif call.data == Messages.ADMIN:
         database.set_subscription(
@@ -283,6 +283,7 @@ def handle_admin_click(call):
     else:
         callback_worker(call)
 
+
 def message_to_subcribed_users(message):
     message_to_all = message.text
     user = database.get_user(message.from_user.id)
@@ -290,7 +291,7 @@ def message_to_subcribed_users(message):
         subscribed = database.get_subscribed_users()
         for subscriber in subscribed:
             bot.send_message(int(subscriber.telegram_id),
-                        Admin.MESSAGE_TO_ALL(user.character_name, message_to_all))
+                             Admin.MESSAGE_TO_ALL(user.character_name, message_to_all))
 
 
 def user_id_exists(message):
@@ -299,65 +300,67 @@ def user_id_exists(message):
     admin_user = database.get_user(message.from_user.id)
 
     if user == None:
-        bot.send_message(message.from_user.id, Admin.SELECT_USER_STATUS_BY_ID_FAILED)
-    elif admin_user.status==Statuses.ADMIN and user.status in [Statuses.ACTIVE, Statuses.BANNED, Statuses.PENDING]:
-      #  bot.send_message(message.from_user.id, Admin.SELECT_USER_STATUS_BY_ID_SUCCESSFUL)
+        bot.send_message(message.from_user.id,
+                         Admin.SELECT_USER_STATUS_BY_ID_FAILED)
+    elif admin_user.status == Statuses.ADMIN and user.status in [Statuses.ACTIVE, Statuses.BANNED, Statuses.PENDING]:
         keyboard = create_confirm_user_menu(user)
         bot.send_message(message.from_user.id, Admin.SELECT_USER_STATUS_BY_ID_SUCCESSFUL,
-                     reply_markup=keyboard)
-    elif admin_user.status==Statuses.SUPERVISOR:
-      #  bot.send_message(message.from_user.id, Admin.SELECT_USER_STATUS_BY_ID_SUCCESSFUL)
+                         reply_markup=keyboard)
+    elif admin_user.status == Statuses.SUPERVISOR:
+
         keyboard = create_confirm_user_menu(user)
-        botutils.add_keys(keyboard,{
+        botutils.add_keys(keyboard, {
             Admin.ADD_ADMIN: f'{Messages.ADD_ADMIN}:{user.telegram_id}',
         })
         bot.send_message(message.from_user.id, Admin.SELECT_USER_STATUS_BY_ID_SUCCESSFUL,
-                     reply_markup=keyboard)
+                         reply_markup=keyboard)
     else:
         bot.send_message(message.from_user.id, Admin.NO_PERMITTIONS)
-        # U have no permission
 
 
-def create_confirm_user_menu(user:User):
+def create_confirm_user_menu(user: User):
     return botutils.create_menu({
-            Locale.CONFIRM: f'{Messages.CONFIRM}:{user.telegram_id}',
-            Locale.NOT_CONFIRM: f'{Messages.NOT_CONFIRM}:{user.telegram_id}',
-            Locale.DELETE: f'{Messages.DELETE}:{user.telegram_id}'
-        })
+        Locale.CONFIRM: f'{Messages.CONFIRM}:{user.telegram_id}',
+        Locale.NOT_CONFIRM: f'{Messages.NOT_CONFIRM}:{user.telegram_id}',
+        Locale.DELETE: f'{Messages.DELETE}:{user.telegram_id}'
+    })
 
 
-#def get_user_nickname(message):
-#    print(f'Get user: {message.text}')
-#    nickname = message.text
-#    database.update_user(message.from_user.id,
-#                         Database.FIELD_CHARACTER_NAME, message.text)
-#    get_user_guild(message)
-
-
-@bot.callback_query_handler(func=lambda call: check_permission(call.from_user.id,[Statuses.ACTIVE]))
+@bot.callback_query_handler(func=lambda call: check_permission(call.from_user.id, [Statuses.ACTIVE]))
 def callback_worker(call):
     if call.data == Messages.SUBSCRIBE:
         database.set_subscription(
-            call.from_user.id, Database.DB_USER_SUBSCRIBED)
+            call.from_user.id, Database.USER_SUBSCRIBED)
         bot.send_message(call.from_user.id,
                          Locale.CHARACTER_SUCCESSFUL_SUBCRIPTION)
         send_menu(call)
     elif call.data == Messages.UNSUBSCRIBE:
         database.set_subscription(
-            call.from_user.id, Database.DB_USER_UNSUBSCRIBED)
+            call.from_user.id, Database.USER_UNSUBSCRIBED)
         bot.send_message(call.from_user.id,
                          Locale.CHARACTER_SUCCESSFUL_UNSUBCRIPTION)
         send_menu(call)
 
-#    elif call.data == Messages.ADD_GUILD:
-#        bot.send_message(call.from_user.id, Locale.GUILD_NAME)
-#        bot.register_next_step_handler_by_chat_id(call.from_user.id, add_guild)
-
-
     elif call.data in Bosses.getList():
         notify_all(call.data, call.from_user.id)
- #       get_telegram_id_by_userid(user_id)
-###--
+    elif call.data == BossCheck.BEGIN_CHECKING:
+        send_check_menu(call.from_user.id)
+
+    elif call.data == BossCheck.CHECK_LIST:
+        text = ''
+        for boss_mask in BossMasks.boss_list():
+            text += f'{BossCheck.CHECK(boss_mask,database.get_users_by_mask(boss_mask))}\n\n'
+
+        bot.send_message(call.from_user.id, text)
+
+    elif call.data.startswith(Messages.CHECK):
+        boss_mask = int(call.data.split(':')[1])
+        if(boss_mask in [BossMasks.ALL, BossMasks.NONE]):
+            database.update_user(
+                call.from_user.id, Database.FIELD_BOSS_MASK, boss_mask)
+        else:
+            database.toggle_user_mask(boss_mask, call.from_user.id)
+        send_check_menu(call.from_user.id)
 
 
 def notify_all(boss, by):
@@ -368,6 +371,47 @@ def notify_all(boss, by):
         for subscriber in subscribed:
             bot.send_message(int(subscriber.telegram_id),
                              Locale.BOSS_NOTIFICATION(user.character_name, boss))
+
+#################
+
+
+def send_check_menu(telegram_id: str):
+    user = database.get_user(telegram_id)
+    keyboard = {}
+
+    for boss_mask in BossMasks.get_list():
+        btn_text = botutils.format_boss_check_button_text(boss_mask, user)
+        keyboard[btn_text] = f'{Messages.CHECK}:{boss_mask}'
+
+    bot.send_message(telegram_id, BossCheck.WILL_NOTIFY,
+                     reply_markup=botutils.create_menu(keyboard))
+
+
+def notify_all_admins(admin_id, user_id):
+    user = database.get_user(user_id)
+    admin = database.get_user(admin_id)
+    if admin.status in [Statuses.ADMIN, Statuses.SUPERVISOR]:
+        subscribed = database.get_subscribed_users()
+
+        for subscriber in subscribed:
+            bot.send_message(int(subscriber.telegram_id),
+                             Admin.ADMIN_NOTIFICATION(admin.character_name,
+                                                      user.character_name,
+                                                      user.telegram_id,
+                                                      user.status))
+
+
+def notify_all_admins_about_delete(admin_id, user_id):
+    user = database.get_user(user_id)
+    admin = database.get_user(admin_id)
+    if admin.status in [Statuses.ADMIN, Statuses.SUPERVISOR]:
+        subscribed = database.get_subscribed_users()
+
+        for subscriber in subscribed:
+            bot.send_message(int(subscriber.telegram_id),
+                             Admin.ADMIN_NOTIFICATION_DELETE_USER(admin.character_name,
+                                                                  user.character_name,
+                                                                  user.telegram_id))
 
 
 bot.polling(none_stop=True, interval=0)

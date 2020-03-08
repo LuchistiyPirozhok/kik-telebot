@@ -2,20 +2,17 @@
 import sqlite3
 import os
 
-from constants import Database
-
 from threading import RLock
 
-from constants import Database, Commands, DatabaseQueries
+from constants import DatabaseQueries
 
 dbConnection = sqlite3.connect('users.db', uri=True, check_same_thread=False)
 
 c = dbConnection.cursor()
-c.execute(DatabaseQueries.CREATE_TABLE_USERS_IF_NOT_EXISTS)
-c.execute(DatabaseQueries.CREATE_TABLE_GUILDS_IF_NOT_EXISTS)
+c.execute(DatabaseQueries.CREATE_USERS_TABLE)
+c.execute(DatabaseQueries.CREATE_GUILDS_TABLE)
 
 dbConnection.commit()
-
 
 dbLock = RLock()
 
@@ -31,6 +28,7 @@ class User:
         self.guild_name = tpl[4]
         self.reg_code = tpl[5]
         self.status = tpl[6]
+        self.boss_mask = tpl[7]
 
 
 class Guild:
@@ -43,9 +41,9 @@ class Guild:
 def create_user(telegram_id):
     with dbLock:
         #       c.execute('''DELETE FROM users WHERE telegram_id="%s"''' % (telegram_id))
-        c.execute(DatabaseQueries.DELETE_FROM_USERS_WHERE_TELEGRAM_ID(telegram_id))
+        c.execute(DatabaseQueries.DELETE_USER_BY_ID(telegram_id))
 #       c.execute('''INSERT INTO users (telegram_id) VALUES ("%s")''' % (telegram_id))
-        c.execute(DatabaseQueries.INSERT_INTO_USERS_WHERE_TELEGRAM_ID(telegram_id))
+        c.execute(DatabaseQueries.CREATE_USER_WITH_ID(telegram_id))
         dbConnection.commit()
 
 
@@ -53,7 +51,7 @@ def update_user(telegram_id, field, value):
 
     with dbLock:
         #       c.execute('''UPDATE users SET %s="%s" WHERE telegram_id="%s"''' % (field, value, telegram_id))
-        c.execute(DatabaseQueries.UPDATE_USERS_SET_WHERE_TELEGRAM_ID(
+        c.execute(DatabaseQueries.UPDATE_USER_FIELD(
             field, value, telegram_id))
         dbConnection.commit()
 
@@ -62,8 +60,7 @@ def insert_guild(guild_name):
 
     with dbLock:
         #       c.execute('''UPDATE users SET %s="%s" WHERE telegram_id="%s"''' % (field, value, telegram_id))
-        c.execute(DatabaseQueries.INSERT_INTO_GUILDS_SET_WHERE_GUILD_NAME(
-            guild_name))
+        c.execute(DatabaseQueries.ADD_GUILD_WITH_NAME(guild_name))
         dbConnection.commit()
 
 
@@ -84,15 +81,15 @@ def get_all_guilds():
 def set_subscription(telegram_id, isSubscribed):
     with dbLock:
         #       c.execute('''UPDATE users set subscribed=%d WHERE telegram_id="%s"''' % (isSubscribed, telegram_id))
-        c.execute(DatabaseQueries.UPDATE_USERS_SET_SUBSCRIBED_WHERE_TELEGRAM_ID(
+        c.execute(DatabaseQueries.UPDATE_USER_SUBSCRIPTION_FLAG(
             isSubscribed, telegram_id))
         dbConnection.commit()
 
 
 def get_subscribed_users():
     with dbLock:
-        #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
-        c.execute(DatabaseQueries.SELECT_ALL_FROM_USERS_WHERE_SUBSCRIBED)
+        #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.USER_SUBSCRIBED))
+        c.execute(DatabaseQueries.SELECT_ALL_SUBSCRIBED_USERS)
 
         rows = c.fetchall()
         res = list()
@@ -106,7 +103,7 @@ def get_user(telegram_id):
     with dbLock:
         #       c.execute('''SELECT * FROM users WHERE telegram_id="%s"''' % (telegram_id))
         c.execute(
-            DatabaseQueries.SELECT_ALL_FROM_USERS_WHERE_TELEGRAM_ID(telegram_id))
+            DatabaseQueries.SELECT_USER_BY_TELEGRAM_ID(telegram_id))
         user = c.fetchone()
 
         if(user is None):
@@ -118,14 +115,15 @@ def get_user(telegram_id):
 def remove_user(telegram_id):
     with dbLock:
         #       c.execute('''DELETE FROM users WHERE telegram_id="%s"''' % (telegram_id))
-        c.execute(DatabaseQueries.DELETE_FROM_USERS_WHERE_TELEGRAM_ID(telegram_id))
+        c.execute(DatabaseQueries.DELETE_USER_BY_ID(telegram_id))
 
         dbConnection.commit()
+
 
 def get_all_users():
     with dbLock:
         #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
-        c.execute(DatabaseQueries.SELECT_ALL_FROM_USERS)
+        c.execute(DatabaseQueries.SELECT_ALL_USERS)
 
         rows = c.fetchall()
         res = list()
@@ -133,23 +131,25 @@ def get_all_users():
         for row in rows:
             res.append(User(row))
         return res
+
 
 def get_all_pending_users():
     with dbLock:
         #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
-        c.execute(DatabaseQueries.SELECT_ALL_FROM_USERS_WHERE_STATUS_PENDING)
-#проверить на наличие
+        c.execute(DatabaseQueries.SELECT_ALL_USERS_WHERE_STATUS_PENDING)
+# проверить на наличие
         rows = c.fetchall()
         res = list()
 
         for row in rows:
             res.append(User(row))
         return res
+
 
 def get_all_banned_users():
     with dbLock:
         #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
-        c.execute(DatabaseQueries.SELECT_ALL_FROM_USERS_WHERE_STATUS_BANNED)
+        c.execute(DatabaseQueries.SELECT_ALL_USERS_WHERE_STATUS_BANNED)
 
         rows = c.fetchall()
         res = list()
@@ -158,10 +158,30 @@ def get_all_banned_users():
             res.append(User(row))
         return res
 
+
 def get_all_admins():
     with dbLock:
         #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
-        c.execute(DatabaseQueries.SELECT_ALL_FROM_USERS_WHERE_STATUS_ADMIN)
+        c.execute(DatabaseQueries.SELECT_ALL_USERS_WHERE_STATUS_ADMIN)
+
+        rows = c.fetchall()
+        res = list()
+
+        for row in rows:
+            res.append(User(row))
+        return res
+
+
+def toggle_user_mask(boss_mask: int, telegram_id: str):
+    with dbLock:
+        c.execute(DatabaseQueries.TOGGLE_BOSSES_BY_MASK(
+            telegram_id, boss_mask))
+        dbConnection.commit()
+
+
+def get_users_by_mask(boss_mask: int):
+    with dbLock:
+        c.execute(DatabaseQueries.SELECT_USERS_BY_MASK(boss_mask))
 
         rows = c.fetchall()
         res = list()
