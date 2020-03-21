@@ -139,7 +139,7 @@ class DatabaseQueries:
 
     @staticmethod
     def SELECT_PAGE_OF_USERS(page: int):
-        return f'SELECT * FROM users limit {PAGE_SIZE} offset {PAGE_SIZE * page}'
+        return f'SELECT * FROM users limit {Database.PAGE_SIZE} offset {Database.PAGE_SIZE * page}'
 
 
 class Commands:
