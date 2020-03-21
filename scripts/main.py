@@ -2,6 +2,7 @@ from typing import List
 from database import User
 from constants import Database, Commands, Statuses, BossMasks
 from localization import LocaleExceptions, Locale, Bosses, Messages, BossCheck, Admin
+from math import ceil
 
 import telebot
 import os
@@ -181,7 +182,7 @@ def handle_unregistered_click(call):
 def handle_admin_click(call):
     if call.data == Messages.ADMIN:
         menu = {
-            Admin.ALL_USERS: Messages.ALL_USERS,
+            Admin.ALL_USERS: f'{Messages.ALL_USERS}:0',
             Admin.ALL_GUILDS: Messages.ALL_GUILDS,
             Admin.ALL_PENDING_USERS: Messages.ALL_PENDING_USERS,
             Admin.ALL_BANNED_USERS: Messages.ALL_BANNED_USERS,
@@ -195,10 +196,17 @@ def handle_admin_click(call):
         bot.send_message(call.from_user.id, text=question,
                          reply_markup=botutils.create_menu(menu))
 
-    elif call.data == Messages.ALL_USERS:
-        users = database.get_all_users()
-        bot.send_message(chat_id=call.from_user.id, text=botutils.format_users_as_table(
-            users), parse_mode='Markdown')
+    elif call.data.startswith(Messages.ALL_USERS):
+        page = int(call.data.split(':')[1])
+        page_count = ceil(database.get_users_count() / Database.PAGE_SIZE)
+        users = database.get_users_page(page)
+
+        keyboard = botutils.create_page_menu(page, page_count)
+
+        bot.send_message(chat_id=call.from_user.id,
+                         text=botutils.format_users_as_table(users),
+                         parse_mode='Markdown',
+                         reply_markup=keyboard)
 
     elif call.data == Messages.ALL_GUILDS:
         guilds = database.get_all_guilds()
