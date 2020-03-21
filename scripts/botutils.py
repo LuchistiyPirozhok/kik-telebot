@@ -1,5 +1,5 @@
 from database import Guild, User
-from localization import Bosses, BossMaskMap
+from localization import Bosses, BossMaskMap, Messages, Locale
 from constants import BossMasks
 from typing import Callable, List, Dict
 from database import Guild, User
@@ -19,6 +19,33 @@ def add_keys(keyboard, buttons: Dict[str, str]):
         )
 
         keyboard.add(keyboard_key)
+
+    return keyboard
+
+
+def create_page_menu(page: int, page_count: int):
+    keyboard = types.InlineKeyboardMarkup(5)
+    buttons = (
+        types.InlineKeyboardButton(
+            text='<<', callback_data=f'{Messages.ALL_USERS}:{0}'),
+        types.InlineKeyboardButton(
+            text='<', callback_data=f'{Messages.ALL_USERS}:{max(page-1,0)}'),
+        types.InlineKeyboardButton(
+            text=f'{page+1}/{page_count}', callback_data=f'{Messages.ALL_USERS}:{page}'),
+        types.InlineKeyboardButton(
+            text='>', callback_data=f'{Messages.ALL_USERS}:{min(page+1,page_count-1)}'),  # using page_count-1 because it
+                                                                                          # should be index, which,
+                                                                                          # obviously, starts from 0
+        types.InlineKeyboardButton(
+            text='>>', callback_data=f'{Messages.ALL_USERS}:{page_count-1}')  # same there
+    )
+    keyboard.add(*buttons)
+
+    keyboard.add(
+        types.InlineKeyboardButton(
+            text=Locale.GO_BACK, callback_data=Messages.ADMIN
+        )
+    )
 
     return keyboard
 
@@ -49,6 +76,7 @@ def set_lng(value, n: int):
 
 
 def format_users_as_table(users: List[User]):
+
     def map_user_to_table_string(user: User):
         return (f"`{set_lng('Персонаж: ',12)}`{user.character_name}\n"
                 f"`{set_lng('ID: ',12)}`{user.telegram_id}\n"

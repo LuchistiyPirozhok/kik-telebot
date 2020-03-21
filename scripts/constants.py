@@ -10,6 +10,7 @@ class Database:
     FIELD_REG_CODE = 'reg_code'
     FIELD_STATUS = 'status'
     FIELD_BOSS_MASK = 'boss_mask'
+    PAGE_SIZE = 10
 
 
 class Statuses:
@@ -80,6 +81,8 @@ class DatabaseQueries:
     SELECT_ALL_USERS_WHERE_STATUS_BANNED = f'SELECT * FROM users WHERE status="{Statuses.BANNED}"'
     SELECT_ALL_USERS_WHERE_STATUS_ADMIN = f'SELECT * FROM users WHERE status>={Statuses.ADMIN}'
 
+    SELECT_USERS_COUNT = f'SELECT count(*) FROM users'
+
     @staticmethod
     def DELETE_USER_BY_ID(telegram_id: str):
         return f'DELETE FROM users WHERE telegram_id="{telegram_id}"'
@@ -133,6 +136,10 @@ class DatabaseQueries:
         Wes use bitwise and to find users with needed boss bit setted up
         '''
         return f' SELECT * FROM users WHERE boss_mask & {boss_mask}'
+
+    @staticmethod
+    def SELECT_PAGE_OF_USERS(page: int):
+        return f'SELECT * FROM users limit {Database.PAGE_SIZE} offset {Database.PAGE_SIZE * page}'
 
 
 class Commands:
