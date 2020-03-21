@@ -92,9 +92,9 @@ def get_registration_code(user: User):
 #   bot.send_message('463808631', text=question,reply_markup=keyboard)
 
     for admin in admins:
-        if(admin.subscribed==Database.USER_SUBSCRIBED):
-            bot.send_message(admin.telegram_id,text=question,reply_markup=keyboard)
-
+        if(admin.subscribed == Database.USER_SUBSCRIBED):
+            bot.send_message(admin.telegram_id, text=question,
+                             reply_markup=keyboard)
 
 
 def random_digits():
@@ -183,7 +183,7 @@ def handle_admin_click(call):
         menu = {
             Admin.ALL_USERS: Messages.ALL_USERS,
             Admin.ALL_GUILDS: Messages.ALL_GUILDS,
-            Admin.ALL_PENDUNG_USERS: Messages.ALL_PENDUNG_USERS,
+            Admin.ALL_PENDING_USERS: Messages.ALL_PENDING_USERS,
             Admin.ALL_BANNED_USERS: Messages.ALL_BANNED_USERS,
             Admin.ALL_ADMINS: Messages.ALL_ADMINS,
             Admin.CHANGE_USER_STATUS: Messages.CHANGE_USER_STATUS,
@@ -205,7 +205,7 @@ def handle_admin_click(call):
         bot.send_message(chat_id=call.from_user.id, text=botutils.format_guilds_as_table(
             guilds), parse_mode='Markdown')
 
-    elif call.data == Messages.ALL_PENDUNG_USERS:
+    elif call.data == Messages.ALL_PENDING_USERS:
         pending_users = database.get_all_pending_users()
         if len(pending_users) == 0:
             bot.send_message(call.from_user.id, Admin.USERS_EMPTY)
@@ -417,5 +417,6 @@ def notify_all_admins_about_delete(admin_id, user_id):
                              Admin.ADMIN_NOTIFICATION_DELETE_USER(admin.character_name,
                                                                   user.character_name,
                                                                   user.telegram_id))
+
 
 bot.polling(none_stop=True, interval=0)

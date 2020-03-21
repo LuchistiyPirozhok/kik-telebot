@@ -12,6 +12,7 @@ c = dbConnection.cursor()
 c.execute(DatabaseQueries.CREATE_USERS_TABLE)
 c.execute(DatabaseQueries.CREATE_GUILDS_TABLE)
 
+
 dbConnection.commit()
 
 dbLock = RLock()
@@ -36,6 +37,14 @@ class Guild:
         super().__init__()
 
         self.guild_name = tpl[0]
+
+
+def map_tuples_to_users(rows):
+    res = list()
+
+    for row in rows:
+        res.append(User(row))
+    return res
 
 
 def create_user(telegram_id):
@@ -92,11 +101,7 @@ def get_subscribed_users():
         c.execute(DatabaseQueries.SELECT_ALL_SUBSCRIBED_USERS)
 
         rows = c.fetchall()
-        res = list()
-
-        for row in rows:
-            res.append(User(row))
-        return res
+        map_tuples_to_users(rows)
 
 
 def get_user(telegram_id):
@@ -126,24 +131,16 @@ def get_all_users():
         c.execute(DatabaseQueries.SELECT_ALL_USERS)
 
         rows = c.fetchall()
-        res = list()
-
-        for row in rows:
-            res.append(User(row))
-        return res
+        map_tuples_to_users(rows)
 
 
 def get_all_pending_users():
     with dbLock:
         #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
         c.execute(DatabaseQueries.SELECT_ALL_USERS_WHERE_STATUS_PENDING)
-# проверить на наличие
+        # проверить на наличие
         rows = c.fetchall()
-        res = list()
-
-        for row in rows:
-            res.append(User(row))
-        return res
+        map_tuples_to_users(rows)
 
 
 def get_all_banned_users():
@@ -152,11 +149,7 @@ def get_all_banned_users():
         c.execute(DatabaseQueries.SELECT_ALL_USERS_WHERE_STATUS_BANNED)
 
         rows = c.fetchall()
-        res = list()
-
-        for row in rows:
-            res.append(User(row))
-        return res
+        map_tuples_to_users(rows)
 
 
 def get_all_admins():
@@ -165,11 +158,7 @@ def get_all_admins():
         c.execute(DatabaseQueries.SELECT_ALL_USERS_WHERE_STATUS_ADMIN)
 
         rows = c.fetchall()
-        res = list()
-
-        for row in rows:
-            res.append(User(row))
-        return res
+        map_tuples_to_users(rows)
 
 
 def toggle_user_mask(boss_mask: int, telegram_id: str):
@@ -184,8 +173,20 @@ def get_users_by_mask(boss_mask: int):
         c.execute(DatabaseQueries.SELECT_USERS_BY_MASK(boss_mask))
 
         rows = c.fetchall()
-        res = list()
+        map_tuples_to_users(rows)
 
-        for row in rows:
-            res.append(User(row))
-        return res
+
+def get_users_page(page: int):
+    with dbLock:
+        c.execute(DatabaseQueries.SELECT_PAGE_OF_USERS(page))
+
+        rows = c.fetchall()
+        map_tuples_to_users(rows)
+
+
+def get_users_count():
+    with dbLock:
+        c.execute(DatabaseQueries.SELECT_USERS_COUNT)
+
+        row = c.fetchone()
+        return int(row[0])
