@@ -30,6 +30,7 @@ class Locale:
     CHARACTER_REG_FAILED = 'К сожалению, вы не прошли регистрацию из-за ошибок в имени персонажа или выборе гильдии. Пожалуйста, попробуйте зарегистрироваться снова'
     CHARACTER_REG_BANNED = 'К сожалению, вы были заблокированы. По всем вопросам обращайтесь к администратору в дискорде'
     CHARACTER_REG_PENDING = 'Заявка на регистрацию уже была отправлена. Пожалуйста, ожидайте ее подтверждения'
+    GO_BACK = 'Назад'
 
     @staticmethod
     def BOSS_NOTIFICATION(user_name, boss_name):
@@ -51,7 +52,7 @@ class Locale:
 class Admin:
     ALL_USERS = 'Вывести таблицу со всеми пользователями'
     ALL_GUILDS = 'Вывести таблицу со всеми гильдиями'
-    ALL_PENDUNG_USERS = 'Вывести список ожидающих подтверждения регистрации пользователей'
+    ALL_PENDING_USERS = 'Вывести список ожидающих подтверждения регистрации пользователей'
     ALL_BANNED_USERS = 'Вывести список забаненных пользователей'
     CHANGE_USER_STATUS = 'Изменить статус пользователя по ID'
     DELETE_USER = 'Удалить пользователя из БД по ID'
@@ -144,7 +145,7 @@ class Messages:
     ADMIN = 'admin'
     ALL_USERS = 'all_users'
     ALL_GUILDS = 'all_guilds'
-    ALL_PENDUNG_USERS = 'all_pending_users'
+    ALL_PENDING_USERS = 'all_pending_users'
     ALL_BANNED_USERS = 'all_banned_users'
     CHANGE_USER_STATUS = 'change_user_status'
     DELETE_USER = 'delete_user'
