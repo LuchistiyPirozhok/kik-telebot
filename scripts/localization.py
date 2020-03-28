@@ -14,7 +14,9 @@ class Locale:
     GUILD_NAME = 'Введите название гильдии'
     BOT_HELP_MESSAGE = ('/start - регистрация\n'
                         '/menu - показать меню\n')
-    BOT_MENU_MESSAGE = 'Меню Kik-Notify:'
+    BOT_MENU_MESSAGE = 'Главное меню'
+    BOT_MENU_MESSAGE_BOSSES = 'Обнаружен мировой босс'
+    BOT_MENU_MESSAGE_BOSSES_DESCRIPTION = 'Внимание! При нажатии по кнопке с боссом вы отправите сообщение всем пользователям с включенной подпиской. Кого вы обнаружили?'
     BOT_ADMIN_MENU = 'Административная часть'
     CHARACTER_SUBCRIPTION = 'Подписаться'
     CHARACTER_UNSUBCRIPTION = 'Отписаться'
@@ -34,7 +36,7 @@ class Locale:
 
     @staticmethod
     def BOSS_NOTIFICATION(user_name, boss_name):
-        return f'{user_name} обнаружил {boss_name}'
+        return f'Внимание! {user_name} обнаружил {boss_name}'
 
     @staticmethod
     def DUPLICATE_CHARACTER_NAME(user_name):
@@ -42,7 +44,7 @@ class Locale:
 
     @staticmethod
     def REGISTRATION_COMPLETE(reg_code):
-        return f'Для завершения регистрации вам нужно сообщить следующий код администратору в дискорде (Dorim#1317): {reg_code}'
+        return f'Для завершения регистрации вам нужно сообщить следующий код администратору в дискорде (Dorim#1317), либо представителю бота в вашей гильдии: {reg_code}'
 
     @staticmethod
     def REGISTRATION_COMPLETE_CONFIRM(user_name, reg_code):
@@ -67,7 +69,7 @@ class Admin:
     CHANGE_USER_STATUS_BY_ID_ADD_ADMIN = 'Вам были выданы права администратора'
     ADD_ADMIN = 'Выдать права администратора'
     NO_PERMITTIONS = 'У вас отсутствуют права на выполнение этого действия'
-    MESSAGE_TEXT = 'Введите сообщение, которое будет отправлено всем активным пользователям с включенной подпиской'
+    MESSAGE_TEXT = 'Введите сообщение, которое будет отправлено всем активным пользователям с включенной подпиской.'
     MESSAGE_TO_ALL_TITLE = 'Сообщение всем подписчикам'
 
     @staticmethod
@@ -117,7 +119,7 @@ BossMaskMap = {
 class BossCheck:
     BEGIN_CHECKING = 'Встать в караул'
     CHECK_LIST = 'Кто в карауле'
-    WILL_NOTIFY = 'Я буду оповещать о появлении'
+    WILL_NOTIFY = 'Я буду оповещать о появлении босса(ов)'
 
     @staticmethod
     def NOBODY(boss_name: str):
@@ -153,6 +155,7 @@ class Messages:
     MESSAGE_TO_ALL = 'message_to_all'
     ADD_ADMIN = 'add_admin'
     CHECK = 'check_boss'
+    WORLD_BOSSES = 'world_bosses'
 
     @staticmethod
     def BOSS_CHECK(boss: str):
