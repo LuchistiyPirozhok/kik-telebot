@@ -272,7 +272,7 @@ def handle_admin_click(call):
     elif call.data == Messages.MESSAGE_TO_ALL:
         bot.send_message(call.from_user.id, Admin.MESSAGE_TEXT)
         bot.register_next_step_handler_by_chat_id(
-            call.from_user.id, message_to_subcribed_users)
+            call.from_user.id, message_to_subscribed_users)
 
     elif call.data == Messages.CHANGE_USER_STATUS:
         bot.send_message(call.from_user.id, Admin.SELECT_USER_STATUS_BY_ID)
@@ -323,7 +323,7 @@ def handle_admin_click(call):
         callback_worker(call)
 
 
-def message_to_subcribed_users(message):
+def message_to_subscribed_users(message):
     message_to_all = message.text
     user = database.get_user(message.from_user.id)
     if user.status in [Statuses.ACTIVE, Statuses.ADMIN, Statuses.SUPERVISOR]:
