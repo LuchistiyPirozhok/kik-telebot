@@ -125,11 +125,11 @@ def send_menu(message):
 def send_menu_by_user(user):
     menu = {
         Locale.BOT_MENU_MESSAGE_BOSSES: Messages.WORLD_BOSSES,
- #       Bosses.KAZZAK: Bosses.KAZZAK,
- #       Bosses.EMERISS: Bosses.EMERISS,
- #       Bosses.LETHON: Bosses.LETHON,
- #       Bosses.YSONDRE: Bosses.YSONDRE,
- #       Bosses.TAERAR: Bosses.TAERAR,
+        #       Bosses.KAZZAK: Bosses.KAZZAK,
+        #       Bosses.EMERISS: Bosses.EMERISS,
+        #       Bosses.LETHON: Bosses.LETHON,
+        #       Bosses.YSONDRE: Bosses.YSONDRE,
+        #       Bosses.TAERAR: Bosses.TAERAR,
         BossCheck.BEGIN_CHECKING: BossCheck.BEGIN_CHECKING,
         BossCheck.CHECK_LIST:  BossCheck.CHECK_LIST
     }
@@ -146,9 +146,12 @@ def send_menu_by_user(user):
     bot.send_message(user.telegram_id, text=question,
                      reply_markup=botutils.create_menu(menu))
 #
+
+
 def send_menu_bosses(message):
     user = database.get_user(message.from_user.id)
     send_menu_by_user_world_bosses(user)
+
 
 def send_menu_by_user_world_bosses(user):
     menu = {
@@ -158,13 +161,14 @@ def send_menu_by_user_world_bosses(user):
         Bosses.LETHON: Bosses.LETHON,
         Bosses.YSONDRE: Bosses.YSONDRE,
         Bosses.TAERAR: Bosses.TAERAR,
- #       BossCheck.BEGIN_CHECKING: BossCheck.BEGIN_CHECKING,
- #       BossCheck.CHECK_LIST:  BossCheck.CHECK_LIST
+        #       BossCheck.BEGIN_CHECKING: BossCheck.BEGIN_CHECKING,
+        #       BossCheck.CHECK_LIST:  BossCheck.CHECK_LIST
     }
     question = Locale.BOT_MENU_MESSAGE_BOSSES_DESCRIPTION
     bot.send_message(user.telegram_id, text=question,
                      reply_markup=botutils.create_menu(menu))
 #
+
 
 def check_permission(user_id: str, permissions: List[int]):
     user = database.get_user(user_id)
@@ -260,16 +264,15 @@ def handle_admin_click(call):
         user = database.get_user(call.from_user.id)
         if user.status in [Statuses.SUPERVISOR]:
             bot.send_message(call.from_user.id, Locale.GUILD_NAME)
-            bot.register_next_step_handler_by_chat_id(call.from_user.id, add_guild)
+            bot.register_next_step_handler_by_chat_id(
+                call.from_user.id, add_guild)
         else:
             bot.send_message(call.from_user.id, Admin.NO_PERMITTIONS)
-
 
     elif call.data == Messages.MESSAGE_TO_ALL:
         bot.send_message(call.from_user.id, Admin.MESSAGE_TEXT)
         bot.register_next_step_handler_by_chat_id(
             call.from_user.id, message_to_subcribed_users)
-
 
     elif call.data == Messages.CHANGE_USER_STATUS:
         bot.send_message(call.from_user.id, Admin.SELECT_USER_STATUS_BY_ID)
@@ -392,7 +395,7 @@ def callback_worker(call):
         for boss_mask in BossMasks.boss_list():
             text += f'{BossCheck.CHECK(boss_mask,database.get_users_by_mask(boss_mask))}\n\n'
 
-        bot.send_message(call.from_user.id, text)
+        bot.send_message(call.from_user.id, text, parse_mode='markdown')
 
     elif call.data.startswith(Messages.CHECK):
         boss_mask = int(call.data.split(':')[1])
