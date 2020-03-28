@@ -124,12 +124,12 @@ def send_menu(message):
 
 def send_menu_by_user(user):
     menu = {
-        Bosses.AZUREGOS: Bosses.AZUREGOS,
-        Bosses.KAZZAK: Bosses.KAZZAK,
-        Bosses.EMERISS: Bosses.EMERISS,
-        Bosses.LETHON: Bosses.LETHON,
-        Bosses.YSONDRE: Bosses.YSONDRE,
-        Bosses.TAERAR: Bosses.TAERAR,
+        Locale.BOT_MENU_MESSAGE_BOSSES: Messages.WORLD_BOSSES,
+ #       Bosses.KAZZAK: Bosses.KAZZAK,
+ #       Bosses.EMERISS: Bosses.EMERISS,
+ #       Bosses.LETHON: Bosses.LETHON,
+ #       Bosses.YSONDRE: Bosses.YSONDRE,
+ #       Bosses.TAERAR: Bosses.TAERAR,
         BossCheck.BEGIN_CHECKING: BossCheck.BEGIN_CHECKING,
         BossCheck.CHECK_LIST:  BossCheck.CHECK_LIST
     }
@@ -145,7 +145,26 @@ def send_menu_by_user(user):
     question = Locale.BOT_MENU_MESSAGE
     bot.send_message(user.telegram_id, text=question,
                      reply_markup=botutils.create_menu(menu))
+#
+def send_menu_bosses(message):
+    user = database.get_user(message.from_user.id)
+    send_menu_by_user_world_bosses(user)
 
+def send_menu_by_user_world_bosses(user):
+    menu = {
+        Bosses.AZUREGOS: Bosses.AZUREGOS,
+        Bosses.KAZZAK: Bosses.KAZZAK,
+        Bosses.EMERISS: Bosses.EMERISS,
+        Bosses.LETHON: Bosses.LETHON,
+        Bosses.YSONDRE: Bosses.YSONDRE,
+        Bosses.TAERAR: Bosses.TAERAR,
+ #       BossCheck.BEGIN_CHECKING: BossCheck.BEGIN_CHECKING,
+ #       BossCheck.CHECK_LIST:  BossCheck.CHECK_LIST
+    }
+    question = Locale.BOT_MENU_MESSAGE_BOSSES_DESCRIPTION
+    bot.send_message(user.telegram_id, text=question,
+                     reply_markup=botutils.create_menu(menu))
+#
 
 def check_permission(user_id: str, permissions: List[int]):
     user = database.get_user(user_id)
@@ -238,16 +257,20 @@ def handle_admin_click(call):
                 all_admins), parse_mode='Markdown')
 
     elif call.data == Messages.ADD_GUILD:
-        bot.send_message(call.from_user.id, Locale.GUILD_NAME)
-        bot.register_next_step_handler_by_chat_id(call.from_user.id, add_guild)
+        user = database.get_user(call.from_user.id)
+        if user.status in [Statuses.SUPERVISOR]:
+            bot.send_message(call.from_user.id, Locale.GUILD_NAME)
+            bot.register_next_step_handler_by_chat_id(call.from_user.id, add_guild)
+        else:
+            bot.send_message(call.from_user.id, Admin.NO_PERMITTIONS)
 
-###
+
     elif call.data == Messages.MESSAGE_TO_ALL:
         bot.send_message(call.from_user.id, Admin.MESSAGE_TEXT)
         bot.register_next_step_handler_by_chat_id(
             call.from_user.id, message_to_subcribed_users)
 
-###
+
     elif call.data == Messages.CHANGE_USER_STATUS:
         bot.send_message(call.from_user.id, Admin.SELECT_USER_STATUS_BY_ID)
         bot.register_next_step_handler_by_chat_id(
@@ -354,6 +377,11 @@ def callback_worker(call):
                          Locale.CHARACTER_SUCCESSFUL_UNSUBCRIPTION)
         send_menu(call)
 
+#
+    elif call.data == Messages.WORLD_BOSSES:
+        send_menu_bosses(call)
+
+#
     elif call.data in Bosses.getList():
         notify_all(call.data, call.from_user.id)
     elif call.data == BossCheck.BEGIN_CHECKING:
@@ -404,7 +432,7 @@ def notify_all_admins(admin_id, user_id):
     user = database.get_user(user_id)
     admin = database.get_user(admin_id)
     if admin.status in [Statuses.ADMIN, Statuses.SUPERVISOR]:
-        subscribed = database.get_subscribed_users()
+        subscribed = database.get_all_subscribed_admins()
 
         for subscriber in subscribed:
             bot.send_message(int(subscriber.telegram_id),
@@ -418,7 +446,7 @@ def notify_all_admins_about_delete(admin_id, user_id):
     user = database.get_user(user_id)
     admin = database.get_user(admin_id)
     if admin.status in [Statuses.ADMIN, Statuses.SUPERVISOR]:
-        subscribed = database.get_subscribed_users()
+        subscribed = database.get_all_subscribed_admins()
 
         for subscriber in subscribed:
             bot.send_message(int(subscriber.telegram_id),

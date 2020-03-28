@@ -80,6 +80,7 @@ class DatabaseQueries:
     SELECT_ALL_USERS_WHERE_STATUS_PENDING = f'SELECT * FROM users WHERE status="{Statuses.PENDING}"'
     SELECT_ALL_USERS_WHERE_STATUS_BANNED = f'SELECT * FROM users WHERE status="{Statuses.BANNED}"'
     SELECT_ALL_USERS_WHERE_STATUS_ADMIN = f'SELECT * FROM users WHERE status>={Statuses.ADMIN}'
+    SELECT_ALL_USERS_WHERE_STATUS_ADMIN_AND_SUBSCRIBED = f'SELECT * FROM users WHERE status>={Statuses.ADMIN} and subscribed={Database.USER_SUBSCRIBED}'
 
     SELECT_USERS_COUNT = f'SELECT count(*) FROM users'
 
