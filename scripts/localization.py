@@ -127,13 +127,16 @@ class BossCheck:
 
     @staticmethod
     def CHECK(boss_mask: int, users: List[User]):
-        if(len(users) == 0):
+        user_count = len(users)
+        if(user_count == 0):
             return BossCheck.NOBODY(BossMaskMap[boss_mask])
 
-        user_names = map(lambda u: u.character_name, users)
-        user_list = ','.join(user_names)
+        separator = ", "
+        more = f'... +{user_count-10}' if(user_count > 10) else ''
+        user_names = map(lambda u: u.character_name, users[:10])
+        user_list = f'`{separator.join(user_names)}`'
 
-        return f'За появлением {BossMaskMap[boss_mask]} следит(ят):\n {user_list}'
+        return f'За появлением {BossMaskMap[boss_mask]} следит(ят):\n{user_list}`{more}`'
 
 
 class Messages:
