@@ -129,11 +129,6 @@ def send_menu(message):
 def send_menu_by_user(user):
     menu = {
         Locale.BOT_MENU_MESSAGE_BOSSES: Messages.WORLD_BOSSES,
-        #       Bosses.KAZZAK: Bosses.KAZZAK,
-        #       Bosses.EMERISS: Bosses.EMERISS,
-        #       Bosses.LETHON: Bosses.LETHON,
-        #       Bosses.YSONDRE: Bosses.YSONDRE,
-        #       Bosses.TAERAR: Bosses.TAERAR,
         BossCheck.BEGIN_CHECKING: BossCheck.BEGIN_CHECKING,
         BossCheck.CHECK_LIST:  BossCheck.CHECK_LIST
     }
@@ -161,12 +156,14 @@ def send_menu_by_user_world_bosses(user):
     menu = {
         Bosses.AZUREGOS: Bosses.AZUREGOS,
         Bosses.KAZZAK: Bosses.KAZZAK,
-        Bosses.EMERISS: Bosses.EMERISS,
-        Bosses.LETHON: Bosses.LETHON,
-        Bosses.YSONDRE: Bosses.YSONDRE,
-        Bosses.TAERAR: Bosses.TAERAR,
-        #       BossCheck.BEGIN_CHECKING: BossCheck.BEGIN_CHECKING,
-        #       BossCheck.CHECK_LIST:  BossCheck.CHECK_LIST
+        Bosses.FERALAS: Bosses.FERALAS,
+        Bosses.DUSKWOOD: Bosses.DUSKWOOD,
+        Bosses.HINTERLANDS: Bosses.HINTERLANDS,
+        Bosses.ASHENVALE: Bosses.ASHENVALE,
+        Locale.GO_BACK: Messages.MENU 
+    
+ #       BossCheck.BEGIN_CHECKING: BossCheck.BEGIN_CHECKING,
+ #       BossCheck.CHECK_LIST:  BossCheck.CHECK_LIST
     }
     question = Locale.BOT_MENU_MESSAGE_BOSSES_DESCRIPTION
     bot.send_message(user.telegram_id, text=question,
@@ -216,7 +213,8 @@ def handle_admin_click(call):
             Admin.ALL_ADMINS: Messages.ALL_ADMINS,
             Admin.CHANGE_USER_STATUS: Messages.CHANGE_USER_STATUS,
             Admin.ADD_GUILD: Messages.ADD_GUILD,
-            Admin.MESSAGE_TO_ALL_TITLE: Messages.MESSAGE_TO_ALL
+            Admin.MESSAGE_TO_ALL_TITLE: Messages.MESSAGE_TO_ALL,
+            Locale.GO_BACK: Messages.MENU
         }
 
         question = Locale.BOT_ADMIN_MENU
@@ -234,6 +232,7 @@ def handle_admin_click(call):
                          text=botutils.format_users_as_table(users),
                          parse_mode='Markdown',
                          reply_markup=keyboard)
+        
 
     elif call.data == Messages.ALL_GUILDS:
         guilds = database.get_all_guilds()
@@ -370,7 +369,9 @@ def create_confirm_user_menu(user: User):
 
 @bot.callback_query_handler(func=lambda call: check_permission(call.from_user.id, [Statuses.ACTIVE]))
 def callback_worker(call):
-    if call.data == Messages.SUBSCRIBE:
+    if call.data == Messages.MENU:
+        send_menu(call)
+    elif call.data == Messages.SUBSCRIBE:
         database.set_subscription(
             call.from_user.id, Database.USER_SUBSCRIBED)
         bot.send_message(call.from_user.id,
@@ -397,8 +398,14 @@ def callback_worker(call):
         text = ''
         for boss_mask in BossMasks.boss_list():
             text += f'{BossCheck.CHECK(boss_mask,database.get_users_by_mask(boss_mask))}\n\n'
-
-        bot.send_message(call.from_user.id, text, parse_mode='markdown')
+        
+        bot.send_message(call.from_user.id, text,
+                         parse_mode='markdown',
+                         reply_markup=botutils.create_menu({
+                             Locale.GO_BACK: Messages.MENU
+                         }))
+        #!
+        
 
     elif call.data.startswith(Messages.CHECK):
         boss_mask = int(call.data.split(':')[1])
@@ -430,6 +437,7 @@ def send_check_menu(telegram_id: str):
         btn_text = botutils.format_boss_check_button_text(boss_mask, user)
         keyboard[btn_text] = f'{Messages.CHECK}:{boss_mask}'
 
+    keyboard[Locale.GO_BACK] =  Messages.MENU
     bot.send_message(telegram_id, BossCheck.WILL_NOTIFY,
                      reply_markup=botutils.create_menu(keyboard))
 
