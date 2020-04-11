@@ -4,6 +4,7 @@ from constants import BossMasks
 from typing import Callable, List, Dict
 from database import Guild, User
 from telebot import types
+from bot_common import get_timestamp
 
 
 def create_menu(buttons: Dict[str, str]):
@@ -78,6 +79,8 @@ def set_lng(value, n: int):
 def format_users_as_table(users: List[User]):
 
     def map_user_to_table_string(user: User):
+        current = get_timestamp()
+
         return (f"`{set_lng('Персонаж: ',12)}`{user.character_name}\n"
                 f"`{set_lng('ID: ',12)}`{user.telegram_id}\n"
                 f"`{set_lng('Подписка: ',12)}`{user.subscribed}\n"
@@ -85,6 +88,7 @@ def format_users_as_table(users: List[User]):
                 f"`{set_lng('Код: ',12)}`{user.reg_code}\n"
                 f"`{set_lng('Статус: ',12)}`{user.status}\n"
                 f"`{set_lng('Чекает: ',12)}`{user.boss_mask}\n"
+                f"`{set_lng('В карауле: ',12)}`{f'{current - user.last_update}  мин' if user.boss_mask > 0 else '-'}"
                 )
 
     users_as_table_rows = map(lambda u: map_user_to_table_string(u), users)

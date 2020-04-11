@@ -1,3 +1,5 @@
+from bot_common import get_timestamp
+
 
 class Database:
     USER_SUBSCRIBED = 1
@@ -10,6 +12,7 @@ class Database:
     FIELD_REG_CODE = 'reg_code'
     FIELD_STATUS = 'status'
     FIELD_BOSS_MASK = 'boss_mask'
+    FIELD_LAST_UPDATE = 'last_update'
     PAGE_SIZE = 10
 
 
@@ -67,7 +70,8 @@ class DatabaseQueries:
               guild_name text,
               reg_code text,
               status int default {Statuses.UNREGISTERED},
-              boss_mask int default {BossMasks.NONE}
+              boss_mask int default {BossMasks.NONE},
+              last_update int default 0
             )'''
 
     CREATE_GUILDS_TABLE = '''CREATE TABLE IF NOT EXISTS guilds
@@ -125,9 +129,12 @@ class DatabaseQueries:
         with (a or b) - (a and b) (a.k.a (a | b)-(a & b)) 
         '''
 
-        return f'''UPDATE users SET {Database.FIELD_BOSS_MASK}=
-            ({Database.FIELD_BOSS_MASK}|{boss_mask})-
-            ({Database.FIELD_BOSS_MASK}&{boss_mask})
+        return f'''UPDATE users SET ({Database.FIELD_BOSS_MASK},{Database.FIELD_LAST_UPDATE}) 
+            VALUES (
+                ({Database.FIELD_BOSS_MASK}|{boss_mask})-
+                ({Database.FIELD_BOSS_MASK}&{boss_mask}),
+                {get_timestamp()}
+            )
             WHERE {Database.FIELD_TELEGRAM_ID}={telegram_id}
         '''
 

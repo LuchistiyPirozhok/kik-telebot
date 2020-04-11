@@ -30,6 +30,7 @@ class User:
         self.reg_code = tpl[5]
         self.status = tpl[6]
         self.boss_mask = tpl[7]
+        self.last_update = tpl[8]
 
 
 class Guild:
@@ -161,10 +162,12 @@ def get_all_admins():
         rows = c.fetchall()
         return map_tuples_to_users(rows)
 
+
 def get_all_subscribed_admins():
     with dbLock:
         #       c.execute('''SELECT * FROM users WHERE subscribed=%d''' % (Database.DB_USER_SUBSCRIBED))
-        c.execute(DatabaseQueries.SELECT_ALL_USERS_WHERE_STATUS_ADMIN_AND_SUBSCRIBED)
+        c.execute(
+            DatabaseQueries.SELECT_ALL_USERS_WHERE_STATUS_ADMIN_AND_SUBSCRIBED)
 
         rows = c.fetchall()
         res = list()
@@ -172,6 +175,7 @@ def get_all_subscribed_admins():
         for row in rows:
             res.append(User(row))
         return res
+
 
 def toggle_user_mask(boss_mask: int, telegram_id: str):
     with dbLock:
