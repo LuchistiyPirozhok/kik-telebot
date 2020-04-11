@@ -9,6 +9,10 @@ import os
 import database
 import botutils
 
+import schedule
+import threading
+import time
+
 import random
 
 from telebot import types
@@ -272,7 +276,7 @@ def handle_admin_click(call):
     elif call.data == Messages.MESSAGE_TO_ALL:
         bot.send_message(call.from_user.id, Admin.MESSAGE_TEXT)
         bot.register_next_step_handler_by_chat_id(
-            call.from_user.id, message_to_subcribed_users)
+            call.from_user.id, message_to_subscribed_users)
 
     elif call.data == Messages.CHANGE_USER_STATUS:
         bot.send_message(call.from_user.id, Admin.SELECT_USER_STATUS_BY_ID)
@@ -323,14 +327,13 @@ def handle_admin_click(call):
         callback_worker(call)
 
 
-def message_to_subcribed_users(message):
+def message_to_subscribed_users(message):
     message_to_all = message.text
     user = database.get_user(message.from_user.id)
-    if user.status in [Statuses.ACTIVE, Statuses.ADMIN, Statuses.SUPERVISOR]:
-        subscribed = database.get_subscribed_users()
-        for subscriber in subscribed:
-            bot.send_message(int(subscriber.telegram_id),
-                             Admin.MESSAGE_TO_ALL(user.character_name, message_to_all))
+    subscribed = database.get_subscribed_users()
+    for subscriber in subscribed:
+        bot.send_message(int(subscriber.telegram_id),
+                         Admin.MESSAGE_TO_ALL(user.character_name, message_to_all))
 
 
 def user_id_exists(message):
@@ -457,5 +460,38 @@ def notify_all_admins_about_delete(admin_id, user_id):
                                                                   user.character_name,
                                                                   user.telegram_id))
 
+
+def notify_expiration():
+    users = database.get_users_with_expired_check()
+
+    usr_count = len(users)
+
+    if usr_count > 0:
+        print(f'Found {usr_count} expired checkers')
+    else:
+        print('No users')
+
+    for user in users:
+        bot.send_message(
+            user.telegram_id,
+            Locale.BOSS_CHECK_EXPIRED
+        )
+
+        database.update_user(user.telegram_id, Database.FIELD_BOSS_MASK, 0)
+
+
+schedule.every(2).minutes.do(notify_expiration)
+
+
+class ScheduleThread(threading.Thread):
+    @classmethod
+    def run(cls):
+        while True:
+            schedule.run_pending()
+            time.sleep(60)
+
+
+continuous_thread = ScheduleThread()
+continuous_thread.start()
 
 bot.polling(none_stop=True, interval=0)

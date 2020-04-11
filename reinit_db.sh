@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS users (telegram_id text PRIMARY KEY,
                                                            guild_name text,
                                                            reg_code text,
                                                            status int default 0,
-                                                           boss_mask int default 0)
+                                                           boss_mask int default 0,
+                                                           last_update int default 0)
 END
 )
 
