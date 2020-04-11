@@ -29,10 +29,10 @@ class Statuses:
 class BossMasks:
     AZUREGOS = 0b000001
     KAZZAK = 0b000010
-    EMERISS = 0b000100
-    LETHON = 0b001000
-    YSONDRE = 0b010000
-    TAERAR = 0b100000
+    FERALAS = 0b000100
+    DUSKWOOD = 0b001000
+    HINTERLANDS = 0b010000
+    ASHENVALE = 0b100000
     ALL = 0b111111
     NONE = 0b000000
 
@@ -41,10 +41,10 @@ class BossMasks:
         return [
             BossMasks.AZUREGOS,
             BossMasks.KAZZAK,
-            BossMasks.EMERISS,
-            BossMasks.LETHON,
-            BossMasks.YSONDRE,
-            BossMasks.TAERAR
+            BossMasks.FERALAS,
+            BossMasks.DUSKWOOD,
+            BossMasks.HINTERLANDS,
+            BossMasks.ASHENVALE
         ]
 
     @staticmethod
@@ -52,10 +52,10 @@ class BossMasks:
         return [
             BossMasks.AZUREGOS,
             BossMasks.KAZZAK,
-            BossMasks.EMERISS,
-            BossMasks.LETHON,
-            BossMasks.YSONDRE,
-            BossMasks.TAERAR,
+            BossMasks.FERALAS,
+            BossMasks.DUSKWOOD,
+            BossMasks.HINTERLANDS,
+            BossMasks.ASHENVALE,
             BossMasks.ALL,
             BossMasks.NONE
         ]
