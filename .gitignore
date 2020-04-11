@@ -133,3 +133,5 @@ dmypy.json
 
 # SQLite db file
 *.db
+
+.vscode

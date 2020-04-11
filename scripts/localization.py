@@ -100,16 +100,14 @@ class Bosses:
   #  ASHENVALE = 'Таэрара'
     ALL = 'Всех'
     NONE = 'Никого'
-    FERALAS =     'Дракона в Фераласе'
-    DUSKWOOD =    'Дракона в Сумеречном лесу'
+    FERALAS = 'Дракона в Фераласе'
+    DUSKWOOD = 'Дракона в Сумеречном лесу'
     HINTERLANDS = 'Дракона во Внутренних землях'
-    ASHENVALE =   'Дракона в Ясеневом лесу'
-    
+    ASHENVALE = 'Дракона в Ясеневом лесу'
 
     @staticmethod
     def getList():
         return [Bosses.AZUREGOS, Bosses.KAZZAK, Bosses.FERALAS, Bosses.DUSKWOOD, Bosses.HINTERLANDS, Bosses.ASHENVALE]
-
 
 
 class Messages:
@@ -138,6 +136,7 @@ class Messages:
     def BOSS_CHECK(boss: str):
         return f'boss_check:{boss}'
 
+
 BossMaskMap = {
     BossMasks.AZUREGOS: Bosses.AZUREGOS,
     BossMasks.KAZZAK: Bosses.KAZZAK,
@@ -147,7 +146,7 @@ BossMaskMap = {
     BossMasks.ASHENVALE: Bosses.ASHENVALE,
     BossMasks.ALL: Bosses.ALL,
     BossMasks.NONE: Bosses.NONE,
-#    Locale.GO_BACK: Messages.MENU
+    #    Locale.GO_BACK: Messages.MENU
 }
 
 
@@ -172,4 +171,3 @@ class BossCheck:
         user_list = f'`{separator.join(user_names)}`'
 
         return f'За появлением {BossMaskMap[boss_mask]} следит(ят):\n{user_list}`{more}`'
-
