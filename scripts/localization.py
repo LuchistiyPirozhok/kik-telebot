@@ -13,7 +13,8 @@ class Locale:
     CHARACTER_NAME = 'Введите имя вашего основного персонажа:'
     GUILD_NAME = 'Введите название гильдии'
     BOT_HELP_MESSAGE = ('/start - регистрация\n'
-                        '/menu - показать меню\n')
+                        '/menu - показать меню\n'
+                        'by LuchistiyPirozhok (a.k.a Остон)')
     BOT_MENU_MESSAGE = 'Главное меню'
     BOT_MENU_MESSAGE_BOSSES = 'Обнаружен мировой босс'
     BOT_MENU_MESSAGE_BOSSES_DESCRIPTION = 'Внимание! При нажатии по кнопке с боссом вы отправите сообщение всем пользователям с включенной подпиской. Кого вы обнаружили?'
@@ -93,27 +94,60 @@ class LocaleExceptions:
 class Bosses:
     AZUREGOS = 'Азурегоса'
     KAZZAK = 'Каззака'
-    EMERISS = 'Эмирисса'
-    LETHON = 'Летона'
-    YSONDRE = 'Исондру'
-    TAERAR = 'Таэрара'
+  #  FERALAS = 'Эмирисса'
+  #  DUSKWOOD = 'Летона'
+  #  HINTERLANDS = 'Исондру'
+  #  ASHENVALE = 'Таэрара'
     ALL = 'Всех'
     NONE = 'Никого'
+    FERALAS =     'Дракона в Фераласе'
+    DUSKWOOD =    'Дракона в Сумеречном лесу'
+    HINTERLANDS = 'Дракона во Внутренних землях'
+    ASHENVALE =   'Дракона в Ясеневом лесу'
+    
 
     @staticmethod
     def getList():
-        return [Bosses.AZUREGOS, Bosses.KAZZAK, Bosses.EMERISS, Bosses.LETHON, Bosses.YSONDRE, Bosses.TAERAR]
+        return [Bosses.AZUREGOS, Bosses.KAZZAK, Bosses.FERALAS, Bosses.DUSKWOOD, Bosses.HINTERLANDS, Bosses.ASHENVALE]
 
+
+
+class Messages:
+    MENU = 'menu'
+    SUBSCRIBE = 'subscribe'
+    UNSUBSCRIBE = 'unsubscribe'
+    ADD_GUILD = 'add_guild'
+    GUILD = 'guild'
+    CONFIRM = 'confirm'
+    NOT_CONFIRM = 'not_confirm'
+    DELETE = 'delete'
+    ADMIN = 'admin'
+    ALL_USERS = 'all_users'
+    ALL_GUILDS = 'all_guilds'
+    ALL_PENDING_USERS = 'all_pending_users'
+    ALL_BANNED_USERS = 'all_banned_users'
+    CHANGE_USER_STATUS = 'change_user_status'
+    DELETE_USER = 'delete_user'
+    ALL_ADMINS = 'all_admins'
+    MESSAGE_TO_ALL = 'message_to_all'
+    ADD_ADMIN = 'add_admin'
+    CHECK = 'check_boss'
+    WORLD_BOSSES = 'world_bosses'
+
+    @staticmethod
+    def BOSS_CHECK(boss: str):
+        return f'boss_check:{boss}'
 
 BossMaskMap = {
     BossMasks.AZUREGOS: Bosses.AZUREGOS,
     BossMasks.KAZZAK: Bosses.KAZZAK,
-    BossMasks.EMERISS: Bosses.EMERISS,
-    BossMasks.LETHON: Bosses.LETHON,
-    BossMasks.YSONDRE: Bosses.YSONDRE,
-    BossMasks.TAERAR: Bosses.TAERAR,
+    BossMasks.FERALAS: Bosses.FERALAS,
+    BossMasks.DUSKWOOD: Bosses.DUSKWOOD,
+    BossMasks.HINTERLANDS: Bosses.HINTERLANDS,
+    BossMasks.ASHENVALE: Bosses.ASHENVALE,
     BossMasks.ALL: Bosses.ALL,
-    BossMasks.NONE: Bosses.NONE
+    BossMasks.NONE: Bosses.NONE,
+#    Locale.GO_BACK: Messages.MENU
 }
 
 
@@ -139,28 +173,3 @@ class BossCheck:
 
         return f'За появлением {BossMaskMap[boss_mask]} следит(ят):\n{user_list}`{more}`'
 
-
-class Messages:
-    SUBSCRIBE = 'subscribe'
-    UNSUBSCRIBE = 'unsubscribe'
-    ADD_GUILD = 'add_guild'
-    GUILD = 'guild'
-    CONFIRM = 'confirm'
-    NOT_CONFIRM = 'not_confirm'
-    DELETE = 'delete'
-    ADMIN = 'admin'
-    ALL_USERS = 'all_users'
-    ALL_GUILDS = 'all_guilds'
-    ALL_PENDING_USERS = 'all_pending_users'
-    ALL_BANNED_USERS = 'all_banned_users'
-    CHANGE_USER_STATUS = 'change_user_status'
-    DELETE_USER = 'delete_user'
-    ALL_ADMINS = 'all_admins'
-    MESSAGE_TO_ALL = 'message_to_all'
-    ADD_ADMIN = 'add_admin'
-    CHECK = 'check_boss'
-    WORLD_BOSSES = 'world_bosses'
-
-    @staticmethod
-    def BOSS_CHECK(boss: str):
-        return f'boss_check:{boss}'
