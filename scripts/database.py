@@ -206,3 +206,11 @@ def get_users_count():
 
         row = c.fetchone()
         return int(row[0])
+
+
+def get_users_with_expired_check():
+    with dbLock:
+        c.execute(DatabaseQueries.GET_USERS_WITH_EXPIRED_CHECK_STAMP())
+
+        rows = c.fetchall()
+        return map_tuples_to_users(rows)

@@ -33,6 +33,7 @@ class Locale:
     CHARACTER_REG_BANNED = 'К сожалению, вы были заблокированы. По всем вопросам обращайтесь к администратору в дискорде'
     CHARACTER_REG_PENDING = 'Заявка на регистрацию уже была отправлена. Пожалуйста, ожидайте ее подтверждения'
     GO_BACK = 'Назад'
+    BOSS_CHECK_EXPIRED = 'Прошло больше часа с последнего обновления. Встаньте в караул снова'
 
     @staticmethod
     def BOSS_NOTIFICATION(user_name, boss_name):

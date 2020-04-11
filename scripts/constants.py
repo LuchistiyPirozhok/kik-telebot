@@ -14,6 +14,7 @@ class Database:
     FIELD_BOSS_MASK = 'boss_mask'
     FIELD_LAST_UPDATE = 'last_update'
     PAGE_SIZE = 10
+    MAX_CHECK_DURATION = 60
 
 
 class Statuses:
@@ -87,6 +88,12 @@ class DatabaseQueries:
     SELECT_ALL_USERS_WHERE_STATUS_ADMIN_AND_SUBSCRIBED = f'SELECT * FROM users WHERE status>={Statuses.ADMIN} and subscribed={Database.USER_SUBSCRIBED}'
 
     SELECT_USERS_COUNT = f'SELECT count(*) FROM users'
+
+    @staticmethod
+    def GET_USERS_WITH_EXPIRED_CHECK_STAMP():
+        return f'''SELECT * FROM users 
+            WHERE {Database.FIELD_BOSS_MASK}>0 AND
+                  {Database.FIELD_LAST_UPDATE}<={get_timestamp()-Database.MAX_CHECK_DURATION}'''
 
     @staticmethod
     def DELETE_USER_BY_ID(telegram_id: str):

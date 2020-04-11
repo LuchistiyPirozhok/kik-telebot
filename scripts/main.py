@@ -9,6 +9,10 @@ import os
 import database
 import botutils
 
+import schedule
+import threading
+import time
+
 import random
 
 from telebot import types
@@ -456,5 +460,38 @@ def notify_all_admins_about_delete(admin_id, user_id):
                                                                   user.character_name,
                                                                   user.telegram_id))
 
+
+def notify_expiration():
+    users = database.get_users_with_expired_check()
+
+    usr_count = len(users)
+
+    if usr_count > 0:
+        print(f'Found {usr_count} expired checkers')
+    else:
+        print('No users')
+
+    for user in users:
+        bot.send_message(
+            user.telegram_id,
+            Locale.BOSS_CHECK_EXPIRED
+        )
+
+        database.update_user(user.telegram_id, Database.FIELD_BOSS_MASK, 0)
+
+
+schedule.every(2).minutes.do(notify_expiration)
+
+
+class ScheduleThread(threading.Thread):
+    @classmethod
+    def run(cls):
+        while True:
+            schedule.run_pending()
+            time.sleep(60)
+
+
+continuous_thread = ScheduleThread()
+continuous_thread.start()
 
 bot.polling(none_stop=True, interval=0)
