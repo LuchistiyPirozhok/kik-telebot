@@ -326,11 +326,10 @@ def handle_admin_click(call):
 def message_to_subscribed_users(message):
     message_to_all = message.text
     user = database.get_user(message.from_user.id)
-    if user.status in [Statuses.ACTIVE, Statuses.ADMIN, Statuses.SUPERVISOR]:
-        subscribed = database.get_subscribed_users()
-        for subscriber in subscribed:
-            bot.send_message(int(subscriber.telegram_id),
-                             Admin.MESSAGE_TO_ALL(user.character_name, message_to_all))
+    subscribed = database.get_subscribed_users()
+    for subscriber in subscribed:
+        bot.send_message(int(subscriber.telegram_id),
+                         Admin.MESSAGE_TO_ALL(user.character_name, message_to_all))
 
 
 def user_id_exists(message):
