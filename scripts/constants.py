@@ -129,12 +129,11 @@ class DatabaseQueries:
         with (a or b) - (a and b) (a.k.a (a | b)-(a & b)) 
         '''
 
-        return f'''UPDATE users SET ({Database.FIELD_BOSS_MASK},{Database.FIELD_LAST_UPDATE}) 
-            VALUES (
-                ({Database.FIELD_BOSS_MASK}|{boss_mask})-
-                ({Database.FIELD_BOSS_MASK}&{boss_mask}),
-                {get_timestamp()}
-            )
+        return f'''UPDATE users SET 
+                {Database.FIELD_BOSS_MASK}=
+                    ({Database.FIELD_BOSS_MASK}|{boss_mask})-
+                    ({Database.FIELD_BOSS_MASK}&{boss_mask}),
+                {Database.FIELD_LAST_UPDATE}={get_timestamp()}
             WHERE {Database.FIELD_TELEGRAM_ID}={telegram_id}
         '''
 

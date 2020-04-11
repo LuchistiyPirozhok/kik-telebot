@@ -88,7 +88,7 @@ def format_users_as_table(users: List[User]):
                 f"`{set_lng('Код: ',12)}`{user.reg_code}\n"
                 f"`{set_lng('Статус: ',12)}`{user.status}\n"
                 f"`{set_lng('Чекает: ',12)}`{user.boss_mask}\n"
-                f"`{set_lng('В карауле: ',12)}`{f'{current - user.last_update}  мин' if user.boss_mask > 0 else '-'}"
+                f"`{set_lng('В карауле: ',12)}`{f'{current - user.last_update}  мин' if user.boss_mask > 0 else '-'}\n"
                 )
 
     users_as_table_rows = map(lambda u: map_user_to_table_string(u), users)
