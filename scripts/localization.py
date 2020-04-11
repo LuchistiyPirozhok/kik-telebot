@@ -13,7 +13,8 @@ class Locale:
     CHARACTER_NAME = 'Введите имя вашего основного персонажа:'
     GUILD_NAME = 'Введите название гильдии'
     BOT_HELP_MESSAGE = ('/start - регистрация\n'
-                        '/menu - показать меню\n')
+                        '/menu - показать меню\n'
+                        'by LuchistiyPirozhok (a.k.a Остон)')
     BOT_MENU_MESSAGE = 'Главное меню'
     BOT_MENU_MESSAGE_BOSSES = 'Обнаружен мировой босс'
     BOT_MENU_MESSAGE_BOSSES_DESCRIPTION = 'Внимание! При нажатии по кнопке с боссом вы отправите сообщение всем пользователям с включенной подпиской. Кого вы обнаружили?'
@@ -33,6 +34,7 @@ class Locale:
     CHARACTER_REG_BANNED = 'К сожалению, вы были заблокированы. По всем вопросам обращайтесь к администратору в дискорде'
     CHARACTER_REG_PENDING = 'Заявка на регистрацию уже была отправлена. Пожалуйста, ожидайте ее подтверждения'
     GO_BACK = 'Назад'
+    BOSS_CHECK_EXPIRED = 'Прошло больше часа с последнего обновления. Встаньте в караул снова'
 
     @staticmethod
     def BOSS_NOTIFICATION(user_name, boss_name):
@@ -92,51 +94,24 @@ class LocaleExceptions:
 class Bosses:
     AZUREGOS = 'Азурегоса'
     KAZZAK = 'Каззака'
-    EMERISS = 'Эмирисса'
-    LETHON = 'Летона'
-    YSONDRE = 'Исондру'
-    TAERAR = 'Таэрара'
+  #  FERALAS = 'Эмирисса'
+  #  DUSKWOOD = 'Летона'
+  #  HINTERLANDS = 'Исондру'
+  #  ASHENVALE = 'Таэрара'
     ALL = 'Всех'
     NONE = 'Никого'
+    FERALAS = 'Дракона в Фераласе'
+    DUSKWOOD = 'Дракона в Сумеречном лесу'
+    HINTERLANDS = 'Дракона во Внутренних землях'
+    ASHENVALE = 'Дракона в Ясеневом лесу'
 
     @staticmethod
     def getList():
-        return [Bosses.AZUREGOS, Bosses.KAZZAK, Bosses.EMERISS, Bosses.LETHON, Bosses.YSONDRE, Bosses.TAERAR]
-
-
-BossMaskMap = {
-    BossMasks.AZUREGOS: Bosses.AZUREGOS,
-    BossMasks.KAZZAK: Bosses.KAZZAK,
-    BossMasks.EMERISS: Bosses.EMERISS,
-    BossMasks.LETHON: Bosses.LETHON,
-    BossMasks.YSONDRE: Bosses.YSONDRE,
-    BossMasks.TAERAR: Bosses.TAERAR,
-    BossMasks.ALL: Bosses.ALL,
-    BossMasks.NONE: Bosses.NONE
-}
-
-
-class BossCheck:
-    BEGIN_CHECKING = 'Встать в караул'
-    CHECK_LIST = 'Кто в карауле'
-    WILL_NOTIFY = 'Я буду оповещать о появлении босса(ов)'
-
-    @staticmethod
-    def NOBODY(boss_name: str):
-        return f'Похоже никто не следит за появлением {boss_name}'
-
-    @staticmethod
-    def CHECK(boss_mask: int, users: List[User]):
-        if(len(users) == 0):
-            return BossCheck.NOBODY(BossMaskMap[boss_mask])
-
-        user_names = map(lambda u: u.character_name, users)
-        user_list = ','.join(user_names)
-
-        return f'За появлением {BossMaskMap[boss_mask]} следит(ят):\n {user_list}'
+        return [Bosses.AZUREGOS, Bosses.KAZZAK, Bosses.FERALAS, Bosses.DUSKWOOD, Bosses.HINTERLANDS, Bosses.ASHENVALE]
 
 
 class Messages:
+    MENU = 'menu'
     SUBSCRIBE = 'subscribe'
     UNSUBSCRIBE = 'unsubscribe'
     ADD_GUILD = 'add_guild'
@@ -160,3 +135,39 @@ class Messages:
     @staticmethod
     def BOSS_CHECK(boss: str):
         return f'boss_check:{boss}'
+
+
+BossMaskMap = {
+    BossMasks.AZUREGOS: Bosses.AZUREGOS,
+    BossMasks.KAZZAK: Bosses.KAZZAK,
+    BossMasks.FERALAS: Bosses.FERALAS,
+    BossMasks.DUSKWOOD: Bosses.DUSKWOOD,
+    BossMasks.HINTERLANDS: Bosses.HINTERLANDS,
+    BossMasks.ASHENVALE: Bosses.ASHENVALE,
+    BossMasks.ALL: Bosses.ALL,
+    BossMasks.NONE: Bosses.NONE,
+    #    Locale.GO_BACK: Messages.MENU
+}
+
+
+class BossCheck:
+    BEGIN_CHECKING = 'Встать в караул'
+    CHECK_LIST = 'Кто в карауле'
+    WILL_NOTIFY = 'Я буду оповещать о появлении босса(ов)'
+
+    @staticmethod
+    def NOBODY(boss_name: str):
+        return f'Похоже никто не следит за появлением {boss_name}'
+
+    @staticmethod
+    def CHECK(boss_mask: int, users: List[User]):
+        user_count = len(users)
+        if(user_count == 0):
+            return BossCheck.NOBODY(BossMaskMap[boss_mask])
+
+        separator = ", "
+        more = f'... +{user_count-10}' if(user_count > 10) else ''
+        user_names = map(lambda u: u.character_name, users[:10])
+        user_list = f'`{separator.join(user_names)}`'
+
+        return f'За появлением {BossMaskMap[boss_mask]} следит(ят):\n{user_list}`{more}`'

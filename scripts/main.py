@@ -9,6 +9,10 @@ import os
 import database
 import botutils
 
+import schedule
+import threading
+import time
+
 import random
 
 from telebot import types
@@ -125,11 +129,6 @@ def send_menu(message):
 def send_menu_by_user(user):
     menu = {
         Locale.BOT_MENU_MESSAGE_BOSSES: Messages.WORLD_BOSSES,
- #       Bosses.KAZZAK: Bosses.KAZZAK,
- #       Bosses.EMERISS: Bosses.EMERISS,
- #       Bosses.LETHON: Bosses.LETHON,
- #       Bosses.YSONDRE: Bosses.YSONDRE,
- #       Bosses.TAERAR: Bosses.TAERAR,
         BossCheck.BEGIN_CHECKING: BossCheck.BEGIN_CHECKING,
         BossCheck.CHECK_LIST:  BossCheck.CHECK_LIST
     }
@@ -146,25 +145,31 @@ def send_menu_by_user(user):
     bot.send_message(user.telegram_id, text=question,
                      reply_markup=botutils.create_menu(menu))
 #
+
+
 def send_menu_bosses(message):
     user = database.get_user(message.from_user.id)
     send_menu_by_user_world_bosses(user)
+
 
 def send_menu_by_user_world_bosses(user):
     menu = {
         Bosses.AZUREGOS: Bosses.AZUREGOS,
         Bosses.KAZZAK: Bosses.KAZZAK,
-        Bosses.EMERISS: Bosses.EMERISS,
-        Bosses.LETHON: Bosses.LETHON,
-        Bosses.YSONDRE: Bosses.YSONDRE,
-        Bosses.TAERAR: Bosses.TAERAR,
- #       BossCheck.BEGIN_CHECKING: BossCheck.BEGIN_CHECKING,
- #       BossCheck.CHECK_LIST:  BossCheck.CHECK_LIST
+        Bosses.FERALAS: Bosses.FERALAS,
+        Bosses.DUSKWOOD: Bosses.DUSKWOOD,
+        Bosses.HINTERLANDS: Bosses.HINTERLANDS,
+        Bosses.ASHENVALE: Bosses.ASHENVALE,
+        Locale.GO_BACK: Messages.MENU
+
+        #       BossCheck.BEGIN_CHECKING: BossCheck.BEGIN_CHECKING,
+        #       BossCheck.CHECK_LIST:  BossCheck.CHECK_LIST
     }
     question = Locale.BOT_MENU_MESSAGE_BOSSES_DESCRIPTION
     bot.send_message(user.telegram_id, text=question,
                      reply_markup=botutils.create_menu(menu))
 #
+
 
 def check_permission(user_id: str, permissions: List[int]):
     user = database.get_user(user_id)
@@ -208,7 +213,8 @@ def handle_admin_click(call):
             Admin.ALL_ADMINS: Messages.ALL_ADMINS,
             Admin.CHANGE_USER_STATUS: Messages.CHANGE_USER_STATUS,
             Admin.ADD_GUILD: Messages.ADD_GUILD,
-            Admin.MESSAGE_TO_ALL_TITLE: Messages.MESSAGE_TO_ALL
+            Admin.MESSAGE_TO_ALL_TITLE: Messages.MESSAGE_TO_ALL,
+            Locale.GO_BACK: Messages.MENU
         }
 
         question = Locale.BOT_ADMIN_MENU
@@ -260,16 +266,15 @@ def handle_admin_click(call):
         user = database.get_user(call.from_user.id)
         if user.status in [Statuses.SUPERVISOR]:
             bot.send_message(call.from_user.id, Locale.GUILD_NAME)
-            bot.register_next_step_handler_by_chat_id(call.from_user.id, add_guild)
+            bot.register_next_step_handler_by_chat_id(
+                call.from_user.id, add_guild)
         else:
             bot.send_message(call.from_user.id, Admin.NO_PERMITTIONS)
-
 
     elif call.data == Messages.MESSAGE_TO_ALL:
         bot.send_message(call.from_user.id, Admin.MESSAGE_TEXT)
         bot.register_next_step_handler_by_chat_id(
-            call.from_user.id, message_to_subcribed_users)
-
+            call.from_user.id, message_to_subscribed_users)
 
     elif call.data == Messages.CHANGE_USER_STATUS:
         bot.send_message(call.from_user.id, Admin.SELECT_USER_STATUS_BY_ID)
@@ -320,14 +325,13 @@ def handle_admin_click(call):
         callback_worker(call)
 
 
-def message_to_subcribed_users(message):
+def message_to_subscribed_users(message):
     message_to_all = message.text
     user = database.get_user(message.from_user.id)
-    if user.status in [Statuses.ACTIVE, Statuses.ADMIN, Statuses.SUPERVISOR]:
-        subscribed = database.get_subscribed_users()
-        for subscriber in subscribed:
-            bot.send_message(int(subscriber.telegram_id),
-                             Admin.MESSAGE_TO_ALL(user.character_name, message_to_all))
+    subscribed = database.get_subscribed_users()
+    for subscriber in subscribed:
+        bot.send_message(int(subscriber.telegram_id),
+                         Admin.MESSAGE_TO_ALL(user.character_name, message_to_all))
 
 
 def user_id_exists(message):
@@ -364,7 +368,9 @@ def create_confirm_user_menu(user: User):
 
 @bot.callback_query_handler(func=lambda call: check_permission(call.from_user.id, [Statuses.ACTIVE]))
 def callback_worker(call):
-    if call.data == Messages.SUBSCRIBE:
+    if call.data == Messages.MENU:
+        send_menu(call)
+    elif call.data == Messages.SUBSCRIBE:
         database.set_subscription(
             call.from_user.id, Database.USER_SUBSCRIBED)
         bot.send_message(call.from_user.id,
@@ -392,7 +398,11 @@ def callback_worker(call):
         for boss_mask in BossMasks.boss_list():
             text += f'{BossCheck.CHECK(boss_mask,database.get_users_by_mask(boss_mask))}\n\n'
 
-        bot.send_message(call.from_user.id, text)
+        bot.send_message(call.from_user.id, text,
+                         parse_mode='markdown',
+                         reply_markup=botutils.create_menu({
+                             Locale.GO_BACK: Messages.MENU
+                         }))
 
     elif call.data.startswith(Messages.CHECK):
         boss_mask = int(call.data.split(':')[1])
@@ -424,6 +434,7 @@ def send_check_menu(telegram_id: str):
         btn_text = botutils.format_boss_check_button_text(boss_mask, user)
         keyboard[btn_text] = f'{Messages.CHECK}:{boss_mask}'
 
+    keyboard[Locale.GO_BACK] = Messages.MENU
     bot.send_message(telegram_id, BossCheck.WILL_NOTIFY,
                      reply_markup=botutils.create_menu(keyboard))
 
@@ -454,5 +465,38 @@ def notify_all_admins_about_delete(admin_id, user_id):
                                                                   user.character_name,
                                                                   user.telegram_id))
 
+
+def notify_expiration():
+    users = database.get_users_with_expired_check()
+
+    usr_count = len(users)
+
+    if usr_count > 0:
+        print(f'Found {usr_count} expired checkers')
+    else:
+        print('No users')
+
+    for user in users:
+        bot.send_message(
+            user.telegram_id,
+            Locale.BOSS_CHECK_EXPIRED
+        )
+
+        database.update_user(user.telegram_id, Database.FIELD_BOSS_MASK, 0)
+
+
+schedule.every(2).minutes.do(notify_expiration)
+
+
+class ScheduleThread(threading.Thread):
+    @classmethod
+    def run(cls):
+        while True:
+            schedule.run_pending()
+            time.sleep(60)
+
+
+continuous_thread = ScheduleThread()
+continuous_thread.start()
 
 bot.polling(none_stop=True, interval=0)

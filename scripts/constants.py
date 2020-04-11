@@ -1,3 +1,5 @@
+from bot_common import get_timestamp
+
 
 class Database:
     USER_SUBSCRIBED = 1
@@ -10,7 +12,9 @@ class Database:
     FIELD_REG_CODE = 'reg_code'
     FIELD_STATUS = 'status'
     FIELD_BOSS_MASK = 'boss_mask'
+    FIELD_LAST_UPDATE = 'last_update'
     PAGE_SIZE = 10
+    MAX_CHECK_DURATION = 60
 
 
 class Statuses:
@@ -25,10 +29,10 @@ class Statuses:
 class BossMasks:
     AZUREGOS = 0b000001
     KAZZAK = 0b000010
-    EMERISS = 0b000100
-    LETHON = 0b001000
-    YSONDRE = 0b010000
-    TAERAR = 0b100000
+    FERALAS = 0b000100
+    DUSKWOOD = 0b001000
+    HINTERLANDS = 0b010000
+    ASHENVALE = 0b100000
     ALL = 0b111111
     NONE = 0b000000
 
@@ -37,10 +41,10 @@ class BossMasks:
         return [
             BossMasks.AZUREGOS,
             BossMasks.KAZZAK,
-            BossMasks.EMERISS,
-            BossMasks.LETHON,
-            BossMasks.YSONDRE,
-            BossMasks.TAERAR
+            BossMasks.FERALAS,
+            BossMasks.DUSKWOOD,
+            BossMasks.HINTERLANDS,
+            BossMasks.ASHENVALE
         ]
 
     @staticmethod
@@ -48,10 +52,10 @@ class BossMasks:
         return [
             BossMasks.AZUREGOS,
             BossMasks.KAZZAK,
-            BossMasks.EMERISS,
-            BossMasks.LETHON,
-            BossMasks.YSONDRE,
-            BossMasks.TAERAR,
+            BossMasks.FERALAS,
+            BossMasks.DUSKWOOD,
+            BossMasks.HINTERLANDS,
+            BossMasks.ASHENVALE,
             BossMasks.ALL,
             BossMasks.NONE
         ]
@@ -67,7 +71,8 @@ class DatabaseQueries:
               guild_name text,
               reg_code text,
               status int default {Statuses.UNREGISTERED},
-              boss_mask int default {BossMasks.NONE}
+              boss_mask int default {BossMasks.NONE},
+              last_update int default 0
             )'''
 
     CREATE_GUILDS_TABLE = '''CREATE TABLE IF NOT EXISTS guilds
@@ -83,6 +88,12 @@ class DatabaseQueries:
     SELECT_ALL_USERS_WHERE_STATUS_ADMIN_AND_SUBSCRIBED = f'SELECT * FROM users WHERE status>={Statuses.ADMIN} and subscribed={Database.USER_SUBSCRIBED}'
 
     SELECT_USERS_COUNT = f'SELECT count(*) FROM users'
+
+    @staticmethod
+    def GET_USERS_WITH_EXPIRED_CHECK_STAMP():
+        return f'''SELECT * FROM users 
+            WHERE {Database.FIELD_BOSS_MASK}>0 AND
+                  {Database.FIELD_LAST_UPDATE}<={get_timestamp()-Database.MAX_CHECK_DURATION}'''
 
     @staticmethod
     def DELETE_USER_BY_ID(telegram_id: str):
@@ -125,9 +136,11 @@ class DatabaseQueries:
         with (a or b) - (a and b) (a.k.a (a | b)-(a & b)) 
         '''
 
-        return f'''UPDATE users SET {Database.FIELD_BOSS_MASK}=
-            ({Database.FIELD_BOSS_MASK}|{boss_mask})-
-            ({Database.FIELD_BOSS_MASK}&{boss_mask})
+        return f'''UPDATE users SET 
+                {Database.FIELD_BOSS_MASK}=
+                    ({Database.FIELD_BOSS_MASK}|{boss_mask})-
+                    ({Database.FIELD_BOSS_MASK}&{boss_mask}),
+                {Database.FIELD_LAST_UPDATE}={get_timestamp()}
             WHERE {Database.FIELD_TELEGRAM_ID}={telegram_id}
         '''
 
